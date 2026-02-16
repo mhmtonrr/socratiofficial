@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, Suspense } from 'react';
 import { ChevronDown, X, Check } from 'lucide-react';
 
 interface FilterSidebarProps {
@@ -11,7 +11,7 @@ interface FilterSidebarProps {
     maxPrice: number;
 }
 
-export default function FilterSidebar({ categories, sizes, colors, maxPrice }: FilterSidebarProps) {
+function FilterSidebarContent({ categories, sizes, colors, maxPrice }: FilterSidebarProps) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -186,5 +186,20 @@ export default function FilterSidebar({ categories, sizes, colors, maxPrice }: F
                 </div>
             </div>
         </aside>
+    );
+}
+
+export default function FilterSidebar(props: FilterSidebarProps) {
+    return (
+        <Suspense fallback={<div className="animate-pulse space-y-8">
+            <div className="h-4 bg-gray-100 rounded w-1/2"></div>
+            <div className="space-y-4">
+                <div className="h-3 bg-gray-50 rounded w-full"></div>
+                <div className="h-3 bg-gray-50 rounded w-full"></div>
+                <div className="h-3 bg-gray-50 rounded w-full"></div>
+            </div>
+        </div>}>
+            <FilterSidebarContent {...props} />
+        </Suspense>
     );
 }

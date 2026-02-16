@@ -4,11 +4,11 @@ import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { Menu, Search, Heart, ShoppingBag, User, LogOut, LayoutDashboard, X, ChevronRight, Instagram, Facebook } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
-export default function Header() {
+function HeaderContent() {
     const { data: session } = useSession();
     const { cartCount } = useCart();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -331,5 +331,13 @@ export default function Header() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function Header() {
+    return (
+        <Suspense fallback={<div className="h-28 bg-white border-b border-gray-100" />}>
+            <HeaderContent />
+        </Suspense>
     );
 }
