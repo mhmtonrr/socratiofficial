@@ -70,18 +70,14 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className="border-t border-gray-200 pt-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-xs text-text-muted-light">
-                    <p>© 2024 Socrati Official - All rights reserved.</p>
+                    <p>© 2026 Socrati Official - All rights reserved.</p>
                     <div className="flex space-x-6 mt-4 md:mt-0">
                         <Link className="hover:text-primary" href="/legal">Legal Notes</Link>
                         <Link className="hover:text-primary" href="/privacy">Privacy Policy</Link>
                         <Link className="hover:text-primary" href="/cookie-policy">Cookie Policy</Link>
                     </div>
                 </div>
-                <div className="text-center mt-8">
-                    <p className="text-[10px] text-text-muted-light opacity-50">
-                        VAT: IT01113570442 - Share Capital Euro 66.187.078 fully paid up
-                    </p>
-                </div>
+
             </div>
         </footer>
     );

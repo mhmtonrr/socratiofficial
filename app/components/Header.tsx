@@ -231,9 +231,6 @@ function HeaderContent() {
                             >
                                 <Search className="w-5 h-5" />
                             </button>
-                            <button className="text-text-main-light hover:text-primary transition-colors p-1 hidden sm:block">
-                                <Heart className="w-5 h-5" />
-                            </button>
                             <Link href="/cart" className="text-text-main-light hover:text-primary transition-colors p-1 relative">
                                 <ShoppingBag className="w-5 h-5" />
                                 {cartCount > 0 && (

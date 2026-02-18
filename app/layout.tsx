@@ -15,8 +15,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    title: "Socrati Official - Luxury Women's Footwear",
-    description: "Timeless Italian Elegance - Luxury women's shoes and accessories",
+    title: "Socrati Official | Luxury Footwear & Accessories",
+    description: "Timeless Elegance - Luxury shoes, bags, and accessories for men and women.",
 };
 
 import AuthProvider from "./components/AuthProvider";

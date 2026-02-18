@@ -29,7 +29,7 @@ export default function AccountDashboardPage() {
     return (
         <div className="space-y-12">
             {/* Simple Welcome Section */}
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div className="p-8 border border-gray-100 rounded-xl bg-gray-50/30 flex items-start gap-6">
                     <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-gray-100 shrink-0">
                         <ShoppingBag className="w-5 h-5 text-gray-400" />
@@ -52,6 +52,22 @@ export default function AccountDashboardPage() {
                         <p className="text-sm text-gray-500 mb-4">Manage your personal details and authentication security.</p>
                         <Link href="/account/profile" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-2">
                             Edit Profile <ArrowRight className="w-3 h-3" />
+                        </Link>
+                    </div>
+                </div>
+
+                <div className="p-8 border border-gray-100 rounded-xl bg-gray-50/30 flex items-start gap-6">
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-gray-100 shrink-0">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-xs uppercase tracking-widest mb-2">My Addresses</h3>
+                        <p className="text-sm text-gray-500 mb-4">Save and manage your shipping and billing addresses for faster checkout.</p>
+                        <Link href="/account/addresses" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-2">
+                            Manage Addresses <ArrowRight className="w-3 h-3" />
                         </Link>
                     </div>
                 </div>

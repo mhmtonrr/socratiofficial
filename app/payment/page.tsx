@@ -35,6 +35,9 @@ export default function PaymentPage() {
 
     const [isSuccess, setIsSuccess] = useState(false);
 
+    const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+    const [selectedAddressId, setSelectedAddressId] = useState<string>('');
+
     // Redirect if cart is empty
     useEffect(() => {
         if (cartCount === 0 && !isSuccess) {
@@ -45,8 +48,37 @@ export default function PaymentPage() {
     useEffect(() => {
         if (session?.user?.email) {
             setFormData(prev => ({ ...prev, email: session?.user?.email || '' }));
+            fetchSavedAddresses();
         }
     }, [session]);
+
+    const fetchSavedAddresses = async () => {
+        try {
+            const res = await fetch('/api/user/addresses');
+            if (res.ok) {
+                const data = await res.json();
+                setSavedAddresses(data);
+                // Auto-select default address
+                const defaultAddr = data.find((a: any) => a.isDefault);
+                if (defaultAddr) handleAddressSelect(defaultAddr);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleAddressSelect = (addr: any) => {
+        setSelectedAddressId(addr.id);
+        setFormData(prev => ({
+            ...prev,
+            firstName: addr.firstName,
+            lastName: addr.lastName,
+            phone: addr.phone,
+            address: `${addr.street}${addr.addressLine2 ? ', ' + addr.addressLine2 : ''}`,
+            city: addr.city,
+            zip: addr.zipCode
+        }));
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let { id, value } = e.target;
@@ -199,6 +231,30 @@ export default function PaymentPage() {
                                 <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-4">
                                     <h2 className="text-2xl font-serif text-text-main-light">1. Contact Information</h2>
                                 </div>
+
+                                {savedAddresses.length > 0 && (
+                                    <div className="mb-8 animate-in fade-in duration-500">
+                                        <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-4 px-1">Choose Saved Address</p>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {savedAddresses.map((addr) => (
+                                                <button
+                                                    key={addr.id}
+                                                    type="button"
+                                                    onClick={() => handleAddressSelect(addr)}
+                                                    className={`text-left p-6 border transition-all relative group ${selectedAddressId === addr.id ? 'border-primary bg-primary/[0.03]' : 'border-gray-200 hover:border-gray-400'}`}
+                                                >
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <span className="text-[10px] uppercase font-black tracking-widest text-text-main-light">{addr.title}</span>
+                                                        {selectedAddressId === addr.id && <div className="w-2 h-2 bg-primary rounded-full" />}
+                                                    </div>
+                                                    <p className="text-xs font-bold text-text-main-light mb-1">{addr.firstName} {addr.lastName}</p>
+                                                    <p className="text-[11px] text-gray-500 font-light truncate">{addr.street}</p>
+                                                    <p className="text-[11px] text-gray-500 font-light">{addr.city}, {addr.state}</p>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                                 <form className="grid grid-cols-1 md:grid-cols-2 gap-6" noValidate>
                                     <div className="col-span-1 md:col-span-2">
                                         <label className="block text-xs uppercase tracking-widest text-text-muted-light mb-2" htmlFor="email">

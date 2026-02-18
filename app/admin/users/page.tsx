@@ -150,8 +150,9 @@ export default function AdminUsersPage() {
 
             {/* Users Directory */}
             <div className="bg-white border border-gray-100 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.02)] overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+                {/* Desktop view */}
+                <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-50/50 border-b border-gray-100">
                                 <th className="px-10 py-6 text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">Identity</th>
@@ -174,12 +175,12 @@ export default function AdminUsersPage() {
                             ) : filteredUsers.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="px-10 py-24 text-center">
-                                        <p className="text-xs font-serif italic text-gray-400">No identities match your current criteria.</p>
+                                        <p className="text-xs font-serif italic text-gray-400">No identities match criteria.</p>
                                     </td>
                                 </tr>
                             ) : (
                                 filteredUsers.map((user) => (
-                                    <tr key={user.id} className="hover:bg-gray-50/30 transition-all group">
+                                    <tr key={user.id} className="hover:bg-gray-50/30 transition-all group border-b border-gray-50/50 last:border-0">
                                         <td className="px-10 py-8">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shadow-inner group-hover:scale-105 transition-transform duration-500">
@@ -193,8 +194,8 @@ export default function AdminUsersPage() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-10 py-8">
-                                            <div className="flex items-center gap-2 text-xs font-medium text-text-main-light">
+                                        <td className="px-10 py-8 text-xs font-medium text-text-main-light">
+                                            <div className="flex items-center gap-2">
                                                 <Mail className="w-3.5 h-3.5 text-gray-300" /> {user.email}
                                             </div>
                                         </td>
@@ -209,25 +210,17 @@ export default function AdminUsersPage() {
                                         </td>
                                         <td className="px-10 py-8">
                                             <div className="flex flex-col gap-1.5">
-                                                <div className="flex items-center gap-2">
-                                                    <ShoppingBag className="w-3.5 h-3.5 text-gray-300" />
-                                                    <span className="text-[10px] font-black text-text-main-light tabular-nums">{user._count.orders} Purchase{user._count.orders !== 1 && 's'}</span>
+                                                <div className="flex items-center gap-2 font-black text-[10px] text-text-main-light">
+                                                    <ShoppingBag className="w-3.5 h-3.5 text-gray-300" /> {user._count.orders} Purchases
                                                 </div>
                                                 <div className="w-24 h-1 bg-gray-50 rounded-full overflow-hidden">
-                                                    <div
-                                                        className="h-full bg-primary transition-all duration-1000"
-                                                        style={{ width: `${Math.min(user._count.orders * 10, 100)}%` }}
-                                                    ></div>
+                                                    <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${Math.min(user._count.orders * 10, 100)}%` }}></div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-10 py-8 text-right">
-                                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
-                                                <button
-                                                    onClick={() => toggleRole(user)}
-                                                    className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all"
-                                                    title="Change privilege level"
-                                                >
+                                            <div className="flex justify-end gap-2 opacity-0 lg:group-hover:opacity-100 transition-all transform translate-x-2 lg:group-hover:translate-x-0">
+                                                <button onClick={() => toggleRole(user)} className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all">
                                                     {user.role === 'ADMIN' ? <ShieldAlert className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
                                                 </button>
                                                 <button className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-rose-500 hover:border-rose-100 hover:shadow-lg transition-all">
@@ -240,6 +233,58 @@ export default function AdminUsersPage() {
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile view */}
+                <div className="lg:hidden">
+                    {loading ? (
+                        <div className="px-6 py-24 text-center">
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="w-10 h-10 border-4 border-primary/10 border-t-primary rounded-full animate-spin"></div>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Directory Sequence...</p>
+                            </div>
+                        </div>
+                    ) : filteredUsers.length === 0 ? (
+                        <div className="px-6 py-24 text-center">
+                            <p className="text-xs font-serif italic text-gray-400">No identities match.</p>
+                        </div>
+                    ) : (
+                        <div className="divide-y divide-gray-50">
+                            {filteredUsers.map((user) => (
+                                <div key={user.id} className="p-6 flex flex-col gap-6 bg-white transition-colors">
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
+                                            <UserIcon className="w-6 h-6 text-gray-300" />
+                                        </div>
+                                        <div className="flex-grow min-w-0">
+                                            <h3 className="text-[14px] font-black text-text-main-light mb-1 truncate">{user.firstName} {user.lastName}</h3>
+                                            <div className="flex items-center gap-2 text-[11px] text-gray-400 truncate mb-3">
+                                                <Mail className="w-3.5 h-3.5" /> {user.email}
+                                            </div>
+                                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-[8px] font-black uppercase tracking-widest ${user.role === 'ADMIN' ? 'bg-primary/5 text-primary border-primary/10' : 'bg-gray-50 text-gray-400 border-gray-100'}`}>
+                                                {user.role === 'ADMIN' ? 'Curator' : 'Member'}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-between p-4 bg-gray-50/50 rounded-2xl">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-[10px] font-black text-text-main-light tracking-tight">{user._count.orders} Purchase{user._count.orders !== 1 && 's'}</span>
+                                            <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest">Atelier Contribution</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => toggleRole(user)} className="w-10 h-10 bg-white border border-gray-100 rounded-xl text-gray-400 flex items-center justify-center hover:text-primary transition-all shadow-sm">
+                                                {user.role === 'ADMIN' ? <ShieldAlert className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
+                                            </button>
+                                            <button className="w-10 h-10 bg-white border border-gray-100 rounded-xl text-rose-400 flex items-center justify-center transition-all shadow-sm">
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 

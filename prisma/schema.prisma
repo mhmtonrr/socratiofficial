@@ -52,18 +52,24 @@ model User {
 }
 
 model Address {
-  id        String  @id @default(uuid())
-  userId    String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type      String  // "BILLING" or "SHIPPING"
-  street    String
-  city      String
-  state     String
-  zipCode   String
-  country   String
-  isDefault Boolean @default(false)
+  id           String  @id @default(uuid())
+  userId       String
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String  // e.g., "Home", "Work"
+  type         String? // Temporary for compatibility
+  firstName    String
+  lastName     String
+  phone        String
+  street       String
+  addressLine2 String?
+  city         String
+  state        String
+  zipCode      String
+  country      String  @default("South Africa")
+  isDefault    Boolean @default(false)
 
-  // Orders can link to specific snapshot addresses, but this links to user's saved addresses
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 // Product Management

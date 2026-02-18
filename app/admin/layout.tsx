@@ -3,14 +3,20 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Bell, ChevronDown, UserCircle } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Bell, ChevronDown, UserCircle, Menu, X } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
     const router = useRouter();
     const pathname = usePathname();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    // Close sidebar when route changes
+    useEffect(() => {
+        setIsSidebarOpen(false);
+    }, [pathname]);
 
     useEffect(() => {
         if (status === 'unauthenticated' || (status === 'authenticated' && (session?.user as any).role !== 'ADMIN')) {
@@ -39,17 +45,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     ];
 
     return (
-        <div className="flex min-h-screen bg-[#FDFDFD]">
+        <div className="flex min-h-screen bg-[#FDFDFD] relative">
+            {/* Mobile Sidebar Overlay */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm transition-opacity"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
             {/* Sidebar - Premium Dark Aesthetic */}
-            <aside className="w-80 bg-[#1A1A1A] text-white hidden lg:flex flex-col sticky top-0 h-screen shadow-[20px_0_40px_rgba(0,0,0,0.05)] z-40">
-                <div className="p-10 pt-12">
-                    <Link href="/admin" className="block text-center space-y-2 group">
+            <aside className={`
+                fixed inset-y-0 left-0 z-50 w-80 bg-[#1A1A1A] text-white flex flex-col 
+                transition-transform duration-300 ease-in-out shadow-[20px_0_40px_rgba(0,0,0,0.05)]
+                lg:translate-x-0 lg:static lg:h-screen lg:shadow-none
+                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+            `}>
+                <div className="p-10 pt-12 flex justify-between items-start">
+                    <Link href="/admin" className="block text-center space-y-2 group w-full">
                         <h1 className="font-serif text-3xl tracking-[0.1em] font-black uppercase group-hover:text-primary transition-colors">
                             Socrati
                         </h1>
                         <div className="h-0.5 w-12 bg-primary mx-auto rounded-full group-hover:w-20 transition-all duration-500"></div>
                         <p className="text-[9px] text-gray-400 uppercase tracking-[0.4em] font-bold">Atelier Management</p>
                     </Link>
+                    {/* Close button for mobile */}
+                    <button
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="lg:hidden text-gray-400 hover:text-white absolute top-6 right-6"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
                 </div>
 
                 <nav className="flex-grow px-6 space-y-1.5 mt-8">
@@ -94,11 +120,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Main Content Area */}
             <div className="flex-grow flex flex-col min-h-screen w-0">
                 {/* Header - Minimalist Glassmorphism */}
-                <header className="h-24 bg-white/80 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-10 sticky top-0 z-30">
+                <header className="h-24 bg-white/80 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-30">
                     <div className="flex items-center gap-4">
-                        <div className="lg:hidden w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-text-main-light border border-gray-100">
-                            <LayoutDashboard className="w-5 h-5" />
-                        </div>
+                        <button
+                            onClick={() => setIsSidebarOpen(true)}
+                            className="lg:hidden w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-text-main-light border border-gray-100 hover:bg-gray-100 transition-colors"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
                         <div>
                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5">Maison Privilege</p>
                             <h2 className="text-sm font-black text-text-main-light uppercase tracking-widest">Atelier Dashboard</h2>
@@ -127,7 +156,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </header>
 
                 {/* Content Container */}
-                <main className="flex-grow p-10 lg:p-14 overflow-x-hidden">
+                <main className="flex-grow p-4 md:p-10 lg:p-14 overflow-x-hidden">
                     <div className="max-w-7xl mx-auto">
                         {children}
                     </div>

@@ -3,10 +3,11 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
+import ProductSlider from './components/ProductSlider';
 
 export default async function Home() {
-    const products = await prisma.product.findMany({
-        take: 4,
+    const rawProducts = await prisma.product.findMany({
+        take: 20,
         orderBy: { createdAt: 'desc' },
         include: {
             images: true,
@@ -14,6 +15,9 @@ export default async function Home() {
             category: true,
         },
     });
+
+    // Serialize Decimals for Client Components
+    const products = JSON.parse(JSON.stringify(rawProducts));
 
     return (
         <>
@@ -97,59 +101,8 @@ export default async function Home() {
                     </div>
                 </section>
 
-                {/* New Arrivals Ticker/Grid */}
-                <section className="bg-gray-50 py-24 overflow-hidden">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-16">
-                            <span className="text-primary text-xs font-black uppercase tracking-[0.3em] block mb-4">Just Arrived</span>
-                            <h3 className="text-4xl md:text-6xl font-serif text-text-main-light text-stroke">New Season</h3>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
-                            {products.map((product) => (
-                                <Link key={product.id} href={`/product/${product.id}`} className="group cursor-pointer block">
-                                    <div className="aspect-[3/4] bg-white mb-6 overflow-hidden relative shadow-sm">
-                                        <span className="absolute top-0 left-0 bg-black text-white text-[10px] font-bold uppercase py-2 px-4 z-10">
-                                            New
-                                        </span>
-                                        {product.images[0] && (
-                                            <Image
-                                                alt={product.name}
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                src={product.images.find(img => img.isMain)?.url || product.images[0].url}
-                                                fill
-                                            />
-                                        )}
-                                        {/* Quick Add Button - appears on hover */}
-                                        <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur text-black py-4 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                                            <span className="text-xs font-bold uppercase tracking-widest">View Details</span>
-                                        </div>
-                                    </div>
-                                    <div className="text-center space-y-2">
-                                        <h4 className="text-sm font-bold uppercase tracking-widest text-text-main-light group-hover:text-primary transition-colors">
-                                            {product.name}
-                                        </h4>
-                                        <p className="text-xs text-gray-400 font-serif italic">
-                                            {product.category?.name || 'Exclusive'}
-                                        </p>
-                                        <p className="text-sm font-medium text-text-main-light">
-                                            R {Number(product.basePrice).toLocaleString()}
-                                        </p>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row justify-center items-center gap-8 mt-16">
-                            <Link href="/women" className="inline-block border-b border-black pb-1 text-sm uppercase tracking-widest font-medium hover:text-primary hover:border-primary transition-colors">
-                                Shop Women
-                            </Link>
-                            <Link href="/men" className="inline-block border-b border-black pb-1 text-sm uppercase tracking-widest font-medium hover:text-primary hover:border-primary transition-colors">
-                                Shop Men
-                            </Link>
-                        </div>
-                    </div>
-                </section>
+                {/* New Arrivals Ticker/Slider */}
+                <ProductSlider products={products} />
 
                 {/* Statement Feature */}
                 <section className="relative h-[600px] md:h-[800px] w-full overflow-hidden">

@@ -142,9 +142,6 @@ export default async function WomenPage({ searchParams }: PageProps) {
 
     return (
         <div className="bg-white min-h-screen">
-            <div className="bg-primary text-white text-[10px] py-2 text-center uppercase tracking-widest font-medium">
-                Complimentary Shipping on all orders over R 5,000
-            </div>
             <Header />
 
             <div className="relative h-[50vh] min-h-[400px] w-full overflow-hidden group">
@@ -232,16 +229,14 @@ export default async function WomenPage({ searchParams }: PageProps) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
                             {products.map((product) => (
                                 <Link key={product.id} href={`/product/${product.id}`} className="group">
-                                    <div className="relative overflow-hidden bg-[#F8F8F8] aspect-[4/5] mb-6">
-                                        <span className="absolute top-5 left-5 bg-white/90 backdrop-blur-sm text-text-main-light text-[9px] uppercase font-bold px-4 py-2 z-10 tracking-[0.2em] shadow-sm">
-                                            Handcrafted
-                                        </span>
+                                    <div className="relative overflow-hidden bg-[#F8F8F8] aspect-square mb-6">
                                         {product.images[0] && (
                                             <Image
                                                 alt={product.name}
                                                 className="object-cover w-full h-full transition-transform duration-[1.5s] ease-out group-hover:scale-110"
                                                 src={product.images.find(i => i.isMain)?.url || product.images[0].url}
                                                 fill
+                                                sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
                                             />
                                         )}
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />

@@ -135,9 +135,6 @@ export default async function MenPage({ searchParams }: PageProps) {
 
     return (
         <div className="bg-[#FCFCFC] min-h-screen">
-            <div className="bg-text-main-light text-white text-[10px] py-2 text-center uppercase tracking-widest font-medium">
-                Complimentary Shipping on all orders over R 5,000
-            </div>
             <Header />
 
             <div className="relative h-[50vh] min-h-[400px] w-full overflow-hidden group">
@@ -223,16 +220,14 @@ export default async function MenPage({ searchParams }: PageProps) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
                             {products.map((product) => (
                                 <Link key={product.id} href={`/product/${product.id}`} className="group drop-shadow-sm hover:drop-shadow-md transition-all">
-                                    <div className="relative overflow-hidden bg-[#F0F0F0] aspect-[4/5] mb-6 shadow-inner">
-                                        <span className="absolute top-5 left-5 bg-text-main-light text-white text-[9px] uppercase font-bold px-4 py-2 z-10 tracking-[0.2em]">
-                                            Core Style
-                                        </span>
+                                    <div className="relative overflow-hidden bg-[#F0F0F0] aspect-square mb-6 shadow-inner">
                                         {product.images[0] && (
                                             <Image
                                                 alt={product.name}
                                                 className="object-cover w-full h-full transition-transform duration-[2s] group-hover:scale-105"
                                                 src={product.images.find(i => i.isMain)?.url || product.images[0].url}
                                                 fill
+                                                sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
                                             />
                                         )}
                                     </div>

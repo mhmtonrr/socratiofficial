@@ -258,8 +258,9 @@ export default function AdminProductsPage() {
 
             {/* Catalogue Gallery */}
             <div className="bg-white border border-gray-100 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+                {/* Desktop View - Table */}
+                <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-50/50 border-b border-gray-100">
                                 <th className="px-10 py-6 w-16">
@@ -274,6 +275,7 @@ export default function AdminProductsPage() {
                                 <th className="px-10 py-6 text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">Identity</th>
                                 <th className="px-10 py-6 text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">Investment</th>
                                 <th className="px-10 py-6 text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">Stock Status</th>
+                                <th className="px-10 py-6 text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">Created</th>
                                 <th className="px-10 py-6 text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 text-right">Edit</th>
                             </tr>
                         </thead>
@@ -352,7 +354,7 @@ export default function AdminProductsPage() {
                                                 </div>
                                             </td>
                                             <td className="px-10 py-8 text-right">
-                                                <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                                                <div className="flex justify-end gap-3 opacity-0 lg:group-hover:opacity-100 transition-all transform translate-x-2 lg:group-hover:translate-x-0">
                                                     <Link
                                                         href={`/admin/products/edit/${product.id}`}
                                                         className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all"
@@ -373,6 +375,88 @@ export default function AdminProductsPage() {
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile View - Cards */}
+                <div className="lg:hidden">
+                    {loading ? (
+                        <div className="px-6 py-24 text-center">
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="w-10 h-10 border-4 border-primary/10 border-t-primary rounded-full animate-spin"></div>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Summoning Collection...</p>
+                            </div>
+                        </div>
+                    ) : filteredProducts.length === 0 ? (
+                        <div className="px-6 py-24 text-center">
+                            <div className="flex flex-col items-center gap-4 text-gray-300">
+                                <Archive className="w-12 h-12 opacity-20" />
+                                <p className="text-xs font-serif italic text-gray-400">No models found.</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="divide-y divide-gray-50">
+                            {filteredProducts.map((product) => {
+                                const totalStock = product.variants?.reduce((sum: number, v: any) => sum + v.stock, 0) || 0;
+                                const isOutOfStock = totalStock === 0;
+                                const isLowStock = totalStock > 0 && totalStock < 10;
+                                const isSelected = selectedIds.includes(product.id);
+
+                                return (
+                                    <div key={product.id} className={`p-6 flex flex-col gap-6 ${isSelected ? 'bg-primary/5' : 'bg-white'}`}>
+                                        <div className="flex gap-4">
+                                            <button
+                                                onClick={() => toggleSelectProduct(product.id)}
+                                                className={`flex-shrink-0 w-5 h-5 mt-1 rounded-lg border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-primary border-primary text-white' : 'border-gray-200'}`}
+                                            >
+                                                {isSelected && <Check className="w-3 h-3" />}
+                                            </button>
+
+                                            <div className="relative w-20 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
+                                                {product.images?.[0] ? (
+                                                    <Image src={product.images[0].url} alt={product.name} fill className="object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                                        <Package className="w-6 h-6 opacity-20" />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="flex-grow min-w-0">
+                                                <h3 className="text-[13px] font-black text-text-main-light mb-1 uppercase tracking-tight truncate">{product.name}</h3>
+                                                <p className="text-[9px] font-black uppercase tracking-widest text-primary/60 bg-primary/5 px-2 py-0.5 rounded inline-block mb-2">
+                                                    {product.category?.name || 'Uncategorized'}
+                                                </p>
+                                                <p className="font-serif text-sm font-black text-text-main-light mb-2">
+                                                    R {Number(product.basePrice).toLocaleString()}
+                                                </p>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`w-2 h-2 rounded-full ${isOutOfStock ? 'bg-rose-500' : isLowStock ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
+                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${isOutOfStock ? 'text-rose-600' : isLowStock ? 'text-amber-600' : 'text-emerald-600'}`}>
+                                                        {totalStock} In Stock
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex gap-3 pt-4 border-t border-gray-50">
+                                            <Link
+                                                href={`/admin/products/edit/${product.id}`}
+                                                className="flex-grow py-3 bg-gray-50 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-primary/5 hover:text-primary transition-all border border-transparent active:border-primary/10"
+                                            >
+                                                <Edit className="w-4 h-4" /> Edit Model
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDelete(product.id)}
+                                                className="w-14 h-12 flex items-center justify-center bg-gray-50 rounded-xl text-rose-400 hover:bg-rose-500/5 transition-all border border-transparent"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
