@@ -89,23 +89,37 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         if (!file) return;
 
         setUploading(index);
-        const formDataUpload = new FormData();
-        formDataUpload.append('file', file);
 
         try {
-            const res = await fetch('/api/admin/upload', {
+            // 1. Get signature
+            const sigRes = await fetch('/api/admin/upload/sign', { method: 'POST' });
+            const sigData = await sigRes.json();
+
+            if (!sigRes.ok) throw new Error(sigData.error || 'Failed to get signature');
+
+            // 2. Direct upload to Cloudinary
+            const formDataUpload = new FormData();
+            formDataUpload.append('file', file);
+            formDataUpload.append('api_key', sigData.apiKey);
+            formDataUpload.append('timestamp', sigData.timestamp.toString());
+            formDataUpload.append('signature', sigData.signature);
+            formDataUpload.append('folder', 'socrati_uploads');
+
+            const cloudinaryRes = await fetch(`https://api.cloudinary.com/v1_1/${sigData.cloudName}/image/upload`, {
                 method: 'POST',
                 body: formDataUpload,
             });
-            const data = await res.json();
-            if (res.ok) {
-                handleImageChange(index, data.url);
+
+            const cloudinaryData = await cloudinaryRes.json();
+
+            if (cloudinaryRes.ok) {
+                handleImageChange(index, cloudinaryData.secure_url);
             } else {
-                alert(data.error || 'Upload failed');
+                alert(cloudinaryData.error?.message || 'Upload failed');
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Upload error:', error);
-            alert('An error occurred during upload');
+            alert(error.message || 'An error occurred during upload');
         } finally {
             setUploading(null);
         }
