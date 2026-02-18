@@ -1,9 +1,14 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { v2 as cloudinary } from 'cloudinary';
+
+// Cloudinary configuration is automatically handled by CLOUDINARY_URL env variable
+// but we can ensure it's initialized if needed.
+cloudinary.config({
+    secure: true
+});
 
 export async function POST(request: Request) {
     try {
@@ -23,27 +28,30 @@ export async function POST(request: Request) {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        // Sanitize filename and add timestamp to avoid collisions
-        const timestamp = Date.now();
-        const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
-        const filename = `${timestamp}-${safeName}`;
+        // Upload to Cloudinary using a Promise to handle the callback-based API
+        const uploadResponse = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                {
+                    folder: 'socrati_uploads',
+                    resource_type: 'auto',
+                },
+                (error, result) => {
+                    if (error) {
+                        console.error('Cloudinary Upload Error:', error);
+                        reject(error);
+                    } else {
+                        resolve(result);
+                    }
+                }
+            );
 
-        const uploadDir = join(process.cwd(), 'public', 'uploads');
+            uploadStream.end(buffer);
+        });
 
-        // Ensure directory exists
-        try {
-            await mkdir(uploadDir, { recursive: true });
-        } catch (e) {
-            // Already exists
-        }
+        const result = uploadResponse as any;
 
-        const path = join(uploadDir, filename);
-        await writeFile(path, buffer);
-
-        // Return the public URL
-        const url = `/uploads/${filename}`;
-
-        return NextResponse.json({ url });
+        // Return the Cloudinary secure URL
+        return NextResponse.json({ url: result.secure_url });
     } catch (error) {
         console.error('Upload Error:', error);
         return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
