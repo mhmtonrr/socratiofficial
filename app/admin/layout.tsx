@@ -163,7 +163,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                     {/* Modern Footer */}
                     <footer className="mt-20 pt-10 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">&copy; 2026 SOCRATI OFFICIAL. EXCLUSIVE ATELIER ACCESS.</p>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">&copy; 2026 SOCRATI. EXCLUSIVE ATELIER ACCESS.</p>
                         <div className="flex items-center gap-6">
                             <Link href="#" className="text-[10px] text-gray-300 hover:text-primary font-black uppercase tracking-widest transition-colors">Architecture Documentation</Link>
                             <Link href="#" className="text-[10px] text-gray-300 hover:text-primary font-black uppercase tracking-widest transition-colors">Privacy Sanctum</Link>

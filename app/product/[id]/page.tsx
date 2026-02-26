@@ -18,7 +18,7 @@ export async function generateMetadata(
 
     if (!product) {
         return {
-            title: "Product Not Found | Socrati Official",
+            title: "Product Not Found | Socrati",
         };
     }
 
@@ -29,7 +29,7 @@ export async function generateMetadata(
     const mainImage = product.images[0]?.url;
 
     return {
-        title: `${product.name} | Socrati Official`,
+        title: `${product.name} | Socrati`,
         description: description,
         openGraph: {
             title: product.name,

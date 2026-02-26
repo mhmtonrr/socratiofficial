@@ -7,7 +7,7 @@ export default function PrivacyPolicyPage() {
         {
             title: "Our Commitment",
             icon: Shield,
-            content: "At Socrati Official, we understand that privacy is the ultimate luxury. We are committed to protecting the personal information you entrust to us, ensuring that your experience with our maison is as secure as it is sophisticated."
+            content: "At Socrati, we understand that privacy is the ultimate luxury. We are committed to protecting the personal information you entrust to us, ensuring that your experience with our maison is as secure as it is sophisticated."
         },
         {
             title: "Information Collection",
@@ -27,7 +27,7 @@ export default function PrivacyPolicyPage() {
         {
             title: "Global Compliance",
             icon: Globe,
-            content: "Socrati Official adheres to international data protection standards, including GDPR. You have the right to access, rectify, or request the erasure of your personal data at any time through our privacy concierge."
+            content: "Socrati adheres to international data protection standards, including GDPR. You have the right to access, rectify, or request the erasure of your personal data at any time through our privacy concierge."
         },
         {
             title: "Policy Refinements",

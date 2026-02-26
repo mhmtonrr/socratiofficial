@@ -53,7 +53,7 @@ export default function Footer() {
                             The Company
                         </h5>
                         <ul className="space-y-3 text-sm text-text-muted-light">
-                            <li><Link className="hover:text-primary transition-colors" href="/about">About Socrati Official</Link></li>
+                            <li><Link className="hover:text-primary transition-colors" href="/about">About Socrati</Link></li>
                             <li><Link className="hover:text-primary transition-colors" href="/boutiques">Boutiques</Link></li>
                         </ul>
                     </div>
@@ -70,7 +70,7 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className="border-t border-gray-200 pt-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-xs text-text-muted-light">
-                    <p>© 2026 Socrati Official - All rights reserved.</p>
+                    <p>© 2026 Socrati - All rights reserved.</p>
                     <div className="flex space-x-6 mt-4 md:mt-0">
                         <Link className="hover:text-primary" href="/legal">Legal Notes</Link>
                         <Link className="hover:text-primary" href="/privacy">Privacy Policy</Link>

@@ -12,7 +12,7 @@ export default function ShipmentsReturnsPage() {
                 <div className="max-w-4xl mx-auto px-4 text-center">
                     <h1 className="text-4xl md:text-5xl font-serif text-text-main-light mb-6 tracking-tight">Shipments & Returns</h1>
                     <p className="text-text-muted-light text-sm md:text-base max-w-2xl mx-auto font-light leading-relaxed">
-                        Excellence in every step. We ensure your Socrati Official pieces reach you with the same care and attention they were crafted with.
+                        Excellence in every step. We ensure your Socrati pieces reach you with the same care and attention they were crafted with.
                     </p>
                 </div>
             </header>
@@ -30,7 +30,7 @@ export default function ShipmentsReturnsPage() {
                             <div className="space-y-6">
                                 <div>
                                     <h3 className="text-[10px] font-bold uppercase tracking-widest text-text-main-light mb-3">Complimentary Shipping</h3>
-                                    <p>Socrati Official offers complimentary express shipping on all orders over R 5,000. For orders below this amount, a flat rate of R 250 applies worldwide.</p>
+                                    <p>Socrati offers complimentary express shipping on all orders over R 5,000. For orders below this amount, a flat rate of R 250 applies worldwide.</p>
                                 </div>
                                 <div>
                                     <h3 className="text-[10px] font-bold uppercase tracking-widest text-text-main-light mb-3">Delivery Times</h3>
@@ -90,7 +90,7 @@ export default function ShipmentsReturnsPage() {
                         <ShieldCheck className="w-10 h-10 text-primary mx-auto" />
                         <h3 className="text-xl font-serif text-text-main-light uppercase tracking-widest">Our Quality Commitment</h3>
                         <p className="text-sm text-gray-400 font-light max-w-2xl mx-auto italic">
-                            "Every pair of Socrati Official shoes undergoes rigorous quality control before it leaves our atelier. If you find any artisanal defect, please reach out to us immediately for our master concierge service."
+                            "Every pair of Socrati shoes undergoes rigorous quality control before it leaves our atelier. If you find any artisanal defect, please reach out to us immediately for our master concierge service."
                         </p>
                     </section>
 

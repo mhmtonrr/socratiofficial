@@ -6,11 +6,11 @@ export default function LegalNotesPage() {
     const sections = [
         {
             title: "1. Corporate Information",
-            content: "Socrati Official is a registered trademark of Socrati Luxury Group S.A. Head Office: Via Montenapoleone, 12, 20121 Milano MI, Italy. Share Capital: Euro 66.187.078,00 fully paid up. VAT Number: IT01113570442."
+            content: "Socrati is a registered trademark of Socrati Luxury Group S.A. Head Office: Via Montenapoleone, 12, 20121 Milano MI, Italy. Share Capital: Euro 66.187.078,00 fully paid up. VAT Number: IT01113570442."
         },
         {
             title: "2. Intellectual Property",
-            content: "All contents of this website, including but not limited to designs, text, graphics, logos, images, and software, are the exclusive property of Socrati Official and are protected by international copyright and trademark laws. Any unauthorized use, reproduction, or distribution is strictly prohibited."
+            content: "All contents of this website, including but not limited to designs, text, graphics, logos, images, and software, are the exclusive property of Socrati and are protected by international copyright and trademark laws. Any unauthorized use, reproduction, or distribution is strictly prohibited."
         },
         {
             title: "3. Terms of Use",
@@ -18,7 +18,7 @@ export default function LegalNotesPage() {
         },
         {
             title: "4. Limitation of Liability",
-            content: "Socrati Official strives to provide accurate and up-to-date information. However, we do not guarantee the completeness or accuracy of any information on the site and are not liable for any damages arising from your use of the website."
+            content: "Socrati strives to provide accurate and up-to-date information. However, we do not guarantee the completeness or accuracy of any information on the site and are not liable for any damages arising from your use of the website."
         }
     ];
 

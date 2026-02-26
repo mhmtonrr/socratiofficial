@@ -14,7 +14,7 @@ export default function AboutPage() {
             {/* Cinematic Hero */}
             <header className="relative w-full h-[90vh] overflow-hidden group">
                 <Image
-                    alt="Socrati Official Heritage"
+                    alt="Socrati Heritage"
                     className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-[3s] ease-out"
                     src="https://images.unsplash.com/photo-1590247813693-5541d1c609fd?q=80&w=2600&auto=format&fit=crop"
                     fill
@@ -49,7 +49,7 @@ export default function AboutPage() {
                             </h2>
                             <div className="space-y-8 text-gray-500 font-light leading-relaxed text-lg">
                                 <p>
-                                    Founded in the heart of Milan's historic Quadrilatero della Moda, Socrati Official began as a whisper among the city's most discerning circles. What started in a small atelier in 1985 has evolved into a global symbol of unapologetic luxury.
+                                    Founded in the heart of Milan's historic Quadrilatero della Moda, Socrati began as a whisper among the city's most discerning circles. What started in a small atelier in 1985 has evolved into a global symbol of unapologetic luxury.
                                 </p>
                                 <p className="font-medium text-text-main-light italic border-l-2 border-primary pl-6 py-2">
                                     "We don't just craft shoes; we curate the foundation of a woman's confidence."

@@ -120,7 +120,7 @@ export default function ContactPage() {
                                     <div>
                                         <h3 className="text-xs font-bold uppercase tracking-widest mb-3 text-primary">Visit Our Boutique</h3>
                                         <address className="not-italic text-sm text-text-main-light leading-relaxed">
-                                            Socrati Official<br />
+                                            Socrati<br />
                                             Via Montenapoleone, 12<br />
                                             20121 Milano MI<br />
                                             Italy
@@ -170,7 +170,7 @@ export default function ContactPage() {
                     referrerPolicy="no-referrer-when-downgrade"
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2790.8797300756745!2d9.189574476685827!3d45.46820463283739!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4786c6ae35c91f1b%3A0x6b772c72477d5402!2sVia%20Montenapoleone%2C%2012%2C%2020121%20Milano%20MI%2C%20Italy!5e0!3m2!1sen!2sus!4v1714850000000!5m2!1sen!2sus"
                     style={{ border: 0, filter: 'grayscale(100%) invert(0%) contrast(85%)', opacity: 0.9 }}
-                    title="Socrati Official Milan Boutique"
+                    title="Socrati Milan Boutique"
                     width="100%"
                 ></iframe>
                 <div className="absolute bottom-6 left-6 md:bottom-12 md:left-12 z-10 bg-surface-light/95 backdrop-blur-sm p-8 shadow-xl max-w-xs border-l-4 border-primary">

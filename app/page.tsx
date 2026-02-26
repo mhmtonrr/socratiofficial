@@ -24,11 +24,11 @@ export default async function Home() {
             <Header />
             <main className="bg-white">
                 {/* Hero Section */}
-                <header className="relative w-full h-[85vh] overflow-hidden group">
+                <header className="relative w-full h-[40vh] md:h-[85vh] overflow-hidden group">
                     <Image
-                        alt="Socrati Official Campaign"
-                        className="w-full h-full object-cover object-center transition-transform duration-[2s] ease-in-out group-hover:scale-105"
-                        src="/uploads/banner1.png"
+                        alt="Socrati Campaign Banner"
+                        className="w-full h-full object-cover object-left md:object-center transition-transform duration-[2s] ease-in-out group-hover:scale-105"
+                        src="/images/banner2.png"
                         fill
                         priority
                         quality={100}
@@ -107,7 +107,7 @@ export default async function Home() {
                 {/* Statement Feature */}
                 <section className="relative h-[600px] md:h-[800px] w-full overflow-hidden">
                     <Image
-                        src="/uploads/dükkanai.png"
+                        src="/images/footer1.png"
                         alt="Stylish Shoppers at Socrati"
                         fill
                         className="object-cover fixed-bg"

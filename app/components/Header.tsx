@@ -181,8 +181,8 @@ function HeaderContent() {
                             </button>
                         </div>
                         <div className="flex-shrink-0 flex items-center justify-center flex-1 md:flex-none">
-                            <Link className="font-serif text-3xl tracking-widest font-bold text-text-main-light uppercase" href="/">
-                                Socrati Official
+                            <Link className="font-condensed text-3xl tracking-widest font-bold text-text-main-light uppercase" href="/">
+                                Socrati
                             </Link>
                         </div>
                         <nav className="hidden lg:flex items-center space-x-10 mx-auto">

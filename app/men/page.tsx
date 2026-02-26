@@ -9,7 +9,7 @@ import { ChevronDown } from 'lucide-react';
 import FilterSidebar from '../components/FilterSidebar';
 
 export const metadata: Metadata = {
-    title: "Men's Collection | Socrati Official",
+    title: "Men's Collection | Socrati",
     description: "Discover artisanal Italian men's footwear. From classic formal shoes to contemporary sneakers, crafted for the modern man.",
 };
 
@@ -140,8 +140,8 @@ export default async function MenPage({ searchParams }: PageProps) {
             <div className="relative h-[50vh] min-h-[400px] w-full overflow-hidden group">
                 <Image
                     alt="Luxury men's collection"
-                    className="w-full h-full object-cover object-[center_15%] transition-transform duration-[3s] group-hover:scale-105"
-                    src="/images/men.png"
+                    className="w-full h-full object-cover object-center transition-transform duration-[3s] group-hover:scale-105"
+                    src="/images/men2.png"
                     fill
                     priority
                 />

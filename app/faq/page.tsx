@@ -21,7 +21,7 @@ const faqData: FAQSection[] = [
         title: 'Authenticity & Craft',
         items: [
             {
-                question: 'Where are Socrati Official products made?',
+                question: 'Where are Socrati products made?',
                 answer: 'Every piece in our collection is handcrafted in our heritage atelier in Italy. We partner with master artisans who have preserved traditional shoemaking techniques for generations, ensuring unparalleled quality and soul in every stitch.',
             },
             {
@@ -43,7 +43,7 @@ const faqData: FAQSection[] = [
             },
             {
                 question: 'Is international shipping available?',
-                answer: 'Yes, Socrati Official ships globally via DHL Express. Delivery times range from 3-7 business days depending on the destination. Duties and taxes are calculated at checkout for most regions.',
+                answer: 'Yes, Socrati ships globally via DHL Express. Delivery times range from 3-7 business days depending on the destination. Duties and taxes are calculated at checkout for most regions.',
             },
             {
                 question: 'Can I cancel or modify my order?',
@@ -73,7 +73,7 @@ const faqData: FAQSection[] = [
             },
             {
                 question: 'Can I have my shoes repaired?',
-                answer: 'Socrati Official offers a refurbishment service for our heritage collections. Visit any of our boutiques for an assessment by our experts, or contact our digital concierge for remote guidance.',
+                answer: 'Socrati offers a refurbishment service for our heritage collections. Visit any of our boutiques for an assessment by our experts, or contact our digital concierge for remote guidance.',
             },
         ],
     },
