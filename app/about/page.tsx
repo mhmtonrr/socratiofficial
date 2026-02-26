@@ -16,17 +16,17 @@ export default function AboutPage() {
                 <Image
                     alt="Socrati Heritage"
                     className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-[3s] ease-out"
-                    src="https://images.unsplash.com/photo-1590247813693-5541d1c609fd?q=80&w=2600&auto=format&fit=crop"
+                    src="/images/footer1.png"
                     fill
                     priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
                 <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
                     <span className="text-white/80 text-[10px] md:text-xs font-black uppercase tracking-[0.6em] mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        Since 1985
+                        Born in South Africa
                     </span>
                     <h1 className="text-white text-6xl md:text-9xl font-serif mb-8 drop-shadow-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000">
-                        Our <span className="italic">Heritage</span>
+                        The Socrati <span className="italic">Story</span>
                     </h1>
                     <div className="w-16 h-1 bg-white/30 rounded-full animate-in fade-in zoom-in duration-1000 delay-500"></div>
                 </div>
@@ -38,39 +38,16 @@ export default function AboutPage() {
                 </div>
             </header>
 
-            {/* The Legend Section */}
-            <section className="py-32 px-6 overflow-hidden">
-                <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
-                        <div className="lg:col-span-5 space-y-12 relative">
-                            <div className="absolute -top-20 -left-10 text-[15rem] font-serif font-black text-gray-50 -z-10 select-none">S</div>
-                            <h2 className="text-4xl md:text-6xl font-serif text-text-main-light leading-[1.1] tracking-tighter">
-                                The Birth of a <span className="italic">Bespoke</span> Passion
-                            </h2>
-                            <div className="space-y-8 text-gray-500 font-light leading-relaxed text-lg">
-                                <p>
-                                    Founded in the heart of Milan's historic Quadrilatero della Moda, Socrati began as a whisper among the city's most discerning circles. What started in a small atelier in 1985 has evolved into a global symbol of unapologetic luxury.
-                                </p>
-                                <p className="font-medium text-text-main-light italic border-l-2 border-primary pl-6 py-2">
-                                    "We don't just craft shoes; we curate the foundation of a woman's confidence."
-                                </p>
-                                <p>
-                                    Every silhouette is a dialogue between traditional Italian mastery and the avant-garde spirit of modern femininity.
-                                </p>
-                            </div>
-                        </div>
-                        <div className="lg:col-span-7">
-                            <div className="relative aspect-[16/10] rounded-[3rem] overflow-hidden shadow-2xl skew-y-1 hover:skew-y-0 transition-transform duration-1000">
-                                <Image
-                                    alt="Master Craftsman"
-                                    className="w-full h-full object-cover"
-                                    src="https://images.unsplash.com/photo-1596462502278-27bfbe4033c1?q=80&w=2600&auto=format&fit=crop"
-                                    fill
-                                />
-                                <div className="absolute inset-0 bg-primary/10 mix-blend-multiply"></div>
-                            </div>
-                        </div>
-                    </div>
+            {/* The Legend Image Section */}
+            <section className="w-full px-4 md:px-8 py-12 md:py-24">
+                <div className="max-w-[1800px] mx-auto">
+                    <Image
+                        alt="About Socrati"
+                        src="/images/aboutus.png"
+                        width={2560}
+                        height={1440}
+                        className="w-full h-auto object-cover rounded-[2rem] shadow-2xl"
+                    />
                 </div>
             </section>
 
@@ -84,20 +61,20 @@ export default function AboutPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
                             {
-                                title: 'Master Craftsmanship',
-                                description: 'Hand-stitched precision using centuries-old techniques refined for the modern age.',
+                                title: 'Premium Leather',
+                                description: 'We source only the finest leathers to craft footwear and bags that stand the test of time, blending durability with luxury.',
                                 icon: Sparkles,
                                 color: 'bg-amber-50 text-amber-600'
                             },
                             {
-                                title: 'Ethical Sourcing',
-                                description: 'Only the highest grade, ethically certified Italian leathers touch our artisans hands.',
+                                title: 'Local Excellence',
+                                description: 'With exclusive boutiques across South Africa, we offer a specialized and intimate shopping experience for every customer.',
                                 icon: Trophy,
                                 color: 'bg-emerald-50 text-emerald-600'
                             },
                             {
-                                title: 'Timeless Vision',
-                                description: 'Pieces designed to transcend seasons, becoming heirlooms of personal style.',
+                                title: 'Timeless Style',
+                                description: 'Designs for men and women that elegantly fuse classic sophistication with contemporary South African flair.',
                                 icon: Leaf,
                                 color: 'bg-blue-50 text-blue-600'
                             },
@@ -123,9 +100,9 @@ export default function AboutPage() {
                     <div className="bg-text-main-light rounded-[4rem] overflow-hidden flex flex-col lg:flex-row shadow-2xl relative">
                         <div className="lg:w-1/2 relative aspect-square lg:aspect-auto h-full min-h-[500px]">
                             <Image
-                                alt="Secret Atelier"
+                                alt="Socrati Boutique"
                                 className="w-full h-full object-cover opacity-80"
-                                src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2670&auto=format&fit=crop"
+                                src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=2670&auto=format&fit=crop"
                                 fill
                             />
                             <div className="absolute inset-0 bg-gradient-to-r from-text-main-light via-transparent to-transparent hidden lg:block"></div>
@@ -133,17 +110,17 @@ export default function AboutPage() {
                         <div className="lg:w-1/2 p-12 lg:p-24 flex flex-col justify-center space-y-10 text-white relative z-10">
                             <Quote className="w-16 h-16 text-primary/20 absolute top-12 right-12" />
                             <h2 className="text-4xl md:text-5xl font-serif italic leading-tight">
-                                Where Silence Speaks <br />in Every Stitch
+                                Step Into Our <br />World
                             </h2>
                             <p className="text-white/70 font-light leading-relaxed text-lg">
-                                Our Milanese atelier is more than a workshop; it is a sanctuary. Here, the hum of machinery is replaced by the focused silence of masters. Each pair of shoes takes over 48 hours of dedicated handwork to reach perfection.
+                                Our Socrati boutiques across South Africa are designed to be more than just stores; they are immersive retail destinations. Experience the rich scent of genuine leather and allow our dedicated staff to guide you toward your perfect pair of shoes or your next signature bag.
                             </p>
                             <div className="pt-6">
                                 <Link
-                                    href="/contact"
+                                    href="/boutiques"
                                     className="inline-flex items-center gap-4 bg-white text-text-main-light px-12 py-5 rounded-full text-xs font-black uppercase tracking-[0.2em] hover:bg-primary hover:text-white transition-all duration-500 group/btn"
                                 >
-                                    Visit the Sanctuary <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                                    Find a Boutique <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                                 </Link>
                             </div>
                         </div>

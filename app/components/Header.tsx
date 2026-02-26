@@ -164,7 +164,7 @@ function HeaderContent() {
                 </div>
                 <div className="flex space-x-4">
                     <span className="text-text-muted-light">
-                        Delivery: <span className="font-semibold text-text-main-light">WW / EN</span>
+                        Delivery: <span className="font-semibold text-text-main-light">ZA / EN</span>
                     </span>
                 </div>
             </div>
@@ -181,8 +181,17 @@ function HeaderContent() {
                             </button>
                         </div>
                         <div className="flex-shrink-0 flex items-center justify-center flex-1 md:flex-none">
-                            <Link className="font-condensed text-3xl tracking-widest font-bold text-text-main-light uppercase" href="/">
-                                Socrati
+                            <Link className="flex items-center gap-3 font-condensed text-3xl tracking-widest font-bold text-text-main-light uppercase group" href="/">
+                                <div className="relative w-12 h-12">
+                                    <Image
+                                        src="/images/socratilogoblack.png"
+                                        alt="Socrati Logo"
+                                        fill
+                                        className="object-contain"
+                                        priority
+                                    />
+                                </div>
+                                <span>Socrati</span>
                             </Link>
                         </div>
                         <nav className="hidden lg:flex items-center space-x-10 mx-auto">

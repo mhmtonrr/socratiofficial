@@ -23,6 +23,10 @@ const robotoCondensed = Roboto_Condensed({
 export const metadata: Metadata = {
     title: "Socrati | Luxury Footwear & Accessories",
     description: "Timeless Elegance - Luxury shoes, bags, and accessories for men and women.",
+    icons: {
+        icon: "/images/socratilogoblack.png",
+        apple: "/images/socratilogoblack.png",
+    },
 };
 
 import AuthProvider from "./components/AuthProvider";
