@@ -143,7 +143,7 @@ function HeaderContent() {
                                 <Facebook className="w-4 h-4 text-text-main-light" />
                             </Link>
                         </div>
-                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-400">© 2024 Socrati</span>
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-400">© 2026 Socrati</span>
                     </div>
                 </div>
             </div>
