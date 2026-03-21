@@ -1,0 +1,245 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+// User & Authentication
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String    // Hashed password
+  firstName     String?
+  lastName      String?
+  role          Role      @default(USER)
+  phone         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  addresses     Address[]
+  orders        Order[]
+  reviews       Review[]
+  cart          Cart?
+}
+
+model Address {
+  id           String  @id @default(uuid())
+  userId       String
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String  // e.g., "Home", "Work"
+  type         String? // Temporary for compatibility
+  firstName    String
+  lastName     String
+  phone        String
+  street       String
+  addressLine2 String?
+  city         String
+  state        String
+  zipCode      String
+  country      String  @default("South Africa")
+  isDefault    Boolean @default(false)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Product Management
+model Category {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String     @unique
+  description String?
+  image       String?
+  
+  parentId    String?
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+  
+  products    Product[]
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  basePrice   Decimal  @db.Decimal(10, 2)
+  isActive    Boolean  @default(true)
+  
+  // Product Details
+  material    String?
+  care        String?  @db.Text
+  details     String[] // List of bullet points
+  
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  
+  variants    ProductVariant[]
+  images      ProductImage[]
+  reviews     Review[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProductImage {
+  id        String  @id @default(uuid())
+  url       String
+  altText   String?
+  isMain    Boolean @default(false)
+  
+  // Optional: Link image to a specific color variant visually
+  color     String? 
+  
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductVariant {
+  id        String   @id @default(uuid())
+  sku       String   @unique
+  
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  // Variant Attributes
+  size      String?  // "38", "42", "M", "One Size"
+  color     String   // "Black", "Navy"
+  colorHex  String?  // "#000000" for UI swatches
+  
+  price     Decimal? @db.Decimal(10, 2) // Override base price if needed
+  stock     Int      @default(0)
+  
+  cartItems CartItem[]
+  orderItems OrderItem[]
+
+  @@unique([productId, size, color]) // Prevent duplicate variants
+}
+
+// Shopping & Orders
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String?    @unique
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // For guest carts, you might use a cookie/session ID, handled in logic not necessarily strictly here as a column,
+  // but helpful to have a session token field if storing guest carts in DB
+  sessionToken String? @unique 
+  
+  items     CartItem[]
+  
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String         @id @default(uuid())
+  cartId    String
+  cart      Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+  
+  quantity  Int
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  orderNumber   String      @unique // Readable ID like ORD-2024-001
+  
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id])
+  
+  guestEmail    String?
+  
+  status        OrderStatus @default(PENDING)
+  totalAmount   Decimal     @db.Decimal(10, 2)
+  shippingCost  Decimal     @default(0) @db.Decimal(10, 2)
+  
+  // Address snapshots (stored as JSON to preserve history even if User updates profile)
+  shippingAddress Json
+  billingAddress  Json
+  
+  items         OrderItem[]
+  payment       Payment?
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model OrderItem {
+  id          String         @id @default(uuid())
+  orderId     String
+  order       Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  variantId   String?        // Nullable if product is deleted, but we want to keep record
+  variant     ProductVariant? @relation(fields: [variantId], references: [id])
+  productName String         // Snapshot
+  sku         String         // Snapshot
+  size        String?        // Snapshot
+  color       String?        // Snapshot
+  
+  quantity    Int
+  unitPrice   Decimal        @db.Decimal(10, 2) // Price at purchase
+  totalPrice  Decimal        @db.Decimal(10, 2)
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  orderId       String        @unique
+  order         Order         @relation(fields: [orderId], references: [id])
+
+  provider      String        // "Payfast", "Stripe", etc.
+  transactionId String?       // Merchant's internal reference (m_payment_id)
+  pfPaymentId   String?       // Payfast's unique transaction ID (pf_payment_id)
+  status        PaymentStatus @default(PENDING)
+  amount        Decimal       @db.Decimal(10, 2)
+  currency      String        @default("ZAR")
+
+  createdAt     DateTime      @default(now())
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  rating    Int      // 1-5
+  comment   String?  @db.Text
+  
+  createdAt DateTime @default(now())
+}
