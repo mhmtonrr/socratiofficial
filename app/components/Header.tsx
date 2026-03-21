@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { Menu, Search, Heart, ShoppingBag, User, LogOut, LayoutDashboard, X, ChevronRight, Instagram, Facebook } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import CartDrawer from './CartDrawer';
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
 function HeaderContent() {
     const { data: session } = useSession();
-    const { cartCount } = useCart();
+    const { cartCount, setIsCartOpen } = useCart();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -84,6 +85,7 @@ function HeaderContent() {
 
     return (
         <div ref={searchRef} className="relative w-full z-50">
+            <CartDrawer />
             {/* Mobile Menu Drawer */}
             <div
                 className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-500 z-[60] lg:hidden ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
@@ -240,14 +242,18 @@ function HeaderContent() {
                             >
                                 <Search className="w-5 h-5" />
                             </button>
-                            <Link href="/cart" className="text-text-main-light hover:text-primary transition-colors p-1 relative">
+                            <button
+                                onClick={() => setIsCartOpen(true)}
+                                className="text-text-main-light hover:text-primary transition-colors p-1 relative"
+                                aria-label="Open cart"
+                            >
                                 <ShoppingBag className="w-5 h-5" />
                                 {cartCount > 0 && (
                                     <span className="absolute -top-1 -right-1 bg-primary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
                                         {cartCount}
                                     </span>
                                 )}
-                            </Link>
+                            </button>
                         </div>
                     </div>
                 </div>

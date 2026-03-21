@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Bell, ChevronDown, UserCircle, Menu, X } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Bell, ChevronDown, UserCircle, Menu, X, CreditCard } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
@@ -41,6 +41,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { label: 'Executive Overview', icon: LayoutDashboard, href: '/admin' },
         { label: 'Master Catalogue', icon: Package, href: '/admin/products' },
         { label: 'Client Orders', icon: ShoppingBag, href: '/admin/orders' },
+        { label: 'Payments', icon: CreditCard, href: '/admin/payments' },
         { label: 'Artisanal Users', icon: Users, href: '/admin/users' },
     ];
 

@@ -219,13 +219,14 @@ model Payment {
   id            String        @id @default(uuid())
   orderId       String        @unique
   order         Order         @relation(fields: [orderId], references: [id])
-  
-  provider      String        // "Stripe", "PayPal"
-  transactionId String?
+
+  provider      String        // "Payfast", "Stripe", etc.
+  transactionId String?       // Merchant's internal reference (m_payment_id)
+  pfPaymentId   String?       // Payfast's unique transaction ID (pf_payment_id)
   status        PaymentStatus @default(PENDING)
   amount        Decimal       @db.Decimal(10, 2)
-  currency      String        @default("USD")
-  
+  currency      String        @default("ZAR")
+
   createdAt     DateTime      @default(now())
 }
 

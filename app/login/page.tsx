@@ -2,12 +2,15 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { Check } from 'lucide-react';
 
 export default function LoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectTo = searchParams.get('redirect') || '/';
 
     // Login State
     const [loginEmail, setLoginEmail] = useState('');
@@ -22,6 +25,7 @@ export default function LoginPage() {
     const [regLastName, setRegLastName] = useState('');
     const [regErrors, setRegErrors] = useState<{ email?: string; password?: string; firstName?: string; lastName?: string; general?: string }>({});
     const [regLoading, setRegLoading] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -49,7 +53,7 @@ export default function LoginPage() {
             if (result?.error) {
                 setLoginErrors({ general: 'Invalid email or password' });
             } else {
-                router.push('/');
+                router.push(redirectTo);
                 router.refresh();
             }
         } catch (error) {
@@ -80,9 +84,6 @@ export default function LoginPage() {
 
         if (!regPassword) errors.password = 'Password is required';
         else if (regPassword.length < 8) errors.password = 'Password must be at least 8 characters';
-        else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/.test(regPassword)) {
-            errors.password = 'Password must include uppercase, lowercase, and numbers';
-        }
 
         if (Object.keys(errors).length > 0) {
             setRegErrors(errors);
@@ -107,12 +108,23 @@ export default function LoginPage() {
             if (!res.ok) {
                 setRegErrors({ general: data.error || 'Registration failed' });
             } else {
-                await signIn('credentials', {
-                    redirect: true,
-                    callbackUrl: '/',
+                // Auto sign in after successful registration
+                const signInResult = await signIn('credentials', {
+                    redirect: false,
                     email: regEmail,
                     password: regPassword,
                 });
+
+                if (signInResult?.ok) {
+                    setSuccessMessage(`Welcome, ${regFirstName}! Your account has been created and you are now signed in.`);
+                    setTimeout(() => {
+                        router.push('/');
+                        router.refresh();
+                    }, 2000);
+                } else {
+                    // Account created but auto-login failed — still show success
+                    setSuccessMessage('Account created successfully! Please sign in below.');
+                }
             }
         } catch (error) {
             setRegErrors({ general: 'An unexpected error occurred' });
@@ -181,6 +193,19 @@ export default function LoginPage() {
                             <p className="text-sm text-gray-500 font-light leading-relaxed mb-8 italic">Creating an account has many benefits: check out faster, keep more than one address, track orders and more.</p>
 
                             <form onSubmit={handleRegister} className="space-y-6">
+                                {successMessage && (
+                                    <div className="bg-green-50 border border-green-200 p-4 animate-in fade-in slide-in-from-top-1 duration-300 flex items-start gap-3">
+                                        <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <Check className="w-3 h-3 text-white" />
+                                        </div>
+                                        <div>
+                                            <p className="text-green-700 text-[10px] uppercase font-bold tracking-widest">{successMessage}</p>
+                                            {successMessage.includes('signed in') && (
+                                                <p className="text-green-500 text-[9px] mt-1 tracking-widest">Redirecting you to the home page...</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                                 {regErrors.general && (
                                     <div className="bg-rose-50 border border-rose-100 p-4 animate-in fade-in slide-in-from-top-1 duration-300">
                                         <p className="text-rose-600 text-[10px] uppercase font-bold tracking-widest">{regErrors.general}</p>

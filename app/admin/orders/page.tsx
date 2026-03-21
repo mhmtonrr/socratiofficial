@@ -36,6 +36,15 @@ type Order = {
         name: string | null;
         email: string | null;
     };
+    payment?: {
+        id: string;
+        provider: string;
+        status: string;
+        amount: any;
+        currency: string;
+        pfPaymentId: string | null;
+        transactionId: string | null;
+    } | null;
 };
 
 export default function AdminOrdersPage() {
@@ -83,6 +92,7 @@ export default function AdminOrdersPage() {
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'PENDING': return 'bg-amber-50 text-amber-700 border-amber-100';
+            case 'PAID': return 'bg-emerald-50 text-emerald-700 border-emerald-100';
             case 'PROCESSING': return 'bg-blue-50 text-blue-700 border-blue-100';
             case 'SHIPPED': return 'bg-purple-50 text-purple-700 border-purple-100';
             case 'DELIVERED': return 'bg-emerald-50 text-emerald-700 border-emerald-100';
@@ -326,10 +336,27 @@ export default function AdminOrdersPage() {
                                 </div>
                                 <div className="space-y-4">
                                     <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary underline underline-offset-8">Payment Info</h4>
-                                    <div className="space-y-2">
-                                        <p className="text-[12px] text-gray-600 font-black uppercase tracking-widest">Stripe Mock Provider</p>
-                                        <p className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded inline-block">SECURE TRANSACTION</p>
-                                    </div>
+                                    {selectedOrder.payment ? (
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-[12px] text-gray-600 font-black uppercase tracking-widest">{selectedOrder.payment.provider}</p>
+                                                <span className={`text-[9px] font-bold px-2 py-0.5 rounded border uppercase tracking-widest ${
+                                                    selectedOrder.payment.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                                    selectedOrder.payment.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                                                    'bg-rose-50 text-rose-600 border-rose-100'
+                                                }`}>{selectedOrder.payment.status}</span>
+                                            </div>
+                                            <p className="text-[11px] text-gray-500 font-medium">Amount: <span className="font-black text-text-main-light">R {Number(selectedOrder.payment.amount).toLocaleString()} {selectedOrder.payment.currency}</span></p>
+                                            {selectedOrder.payment.pfPaymentId && (
+                                                <p className="text-[10px] text-gray-400 font-mono">PF ID: {selectedOrder.payment.pfPaymentId}</p>
+                                            )}
+                                            {selectedOrder.payment.transactionId && (
+                                                <p className="text-[10px] text-gray-400 font-mono truncate max-w-[220px]">TX: {selectedOrder.payment.transactionId}</p>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <p className="text-[11px] text-gray-400 italic">No payment record found</p>
+                                    )}
                                 </div>
                             </div>
 

@@ -32,7 +32,8 @@ export async function GET() {
                         }
                     }
                 },
-                user: true
+                user: true,
+                payment: true,
             },
             orderBy: {
                 createdAt: 'desc',

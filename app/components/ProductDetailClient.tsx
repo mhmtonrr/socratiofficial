@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ShoppingBag, ZoomIn, ChevronRight, ChevronLeft, ShieldCheck, Truck, RefreshCcw, Check, X } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import HappyPayWidget from './HappyPayWidget';
 
 // DB'den gelen tiplere benzer bir interface (Prisma client'ı client-side'da import edemeyiz, o yüzden manuel tanımlıyorum veya any kullanıyorum şimdilik)
 interface ProductProps {
@@ -135,12 +136,13 @@ export default function ProductDetailClient({ product, similarProducts = [] }: P
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
                         {/* Image Section */}
                         <div className="lg:col-span-7 flex flex-col gap-4">
-                            <div
-                                className="relative aspect-square bg-transparent overflow-hidden group cursor-pointer"
-                                onClick={() => setIsLightboxOpen(true)}
-                            >
-                                {mainImage && (
-                                    <>
+                            {/* Wrap image + arrows in a relative container so arrows can escape overflow-hidden */}
+                            <div className="relative">
+                                <div
+                                    className="relative aspect-square bg-transparent overflow-hidden group cursor-pointer"
+                                    onClick={() => setIsLightboxOpen(true)}
+                                >
+                                    {mainImage && (
                                         <Image
                                             alt={product.name}
                                             className="object-contain transition-transform duration-700 group-hover:scale-105"
@@ -149,29 +151,30 @@ export default function ProductDetailClient({ product, similarProducts = [] }: P
                                             priority
                                             sizes="(max-width: 768px) 100vw, 50vw"
                                         />
+                                    )}
+                                </div>
 
-                                        {/* Navigation Arrows */}
-                                        {images.length > 1 && (
-                                            <>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); handlePrevImage(); }}
-                                                    className="absolute left-4 top-1/2 -translate-y-1/2 z-50 bg-white/80 md:bg-white/60 backdrop-blur-md hover:bg-white text-black p-4 rounded-full transition-all shadow-xl border border-gray-100 group/nav"
-                                                    aria-label="Previous image"
-                                                >
-                                                    <ChevronLeft className="w-6 h-6 group-hover/nav:scale-110 transition-transform" />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
-                                                    className="absolute right-4 top-1/2 -translate-y-1/2 z-50 bg-white/80 md:bg-white/60 backdrop-blur-md hover:bg-white text-black p-4 rounded-full transition-all shadow-xl border border-gray-100 group/nav"
-                                                    aria-label="Next image"
-                                                >
-                                                    <ChevronRight className="w-6 h-6 group-hover/nav:scale-110 transition-transform" />
-                                                </button>
-                                            </>
-                                        )}
+                                {/* Navigation Arrows — outside overflow-hidden so z-index works globally */}
+                                {images.length > 1 && (
+                                    <>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handlePrevImage(); }}
+                                            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-md hover:bg-white text-black p-4 rounded-full transition-all shadow-xl border border-gray-100 group/nav"
+                                            aria-label="Previous image"
+                                        >
+                                            <ChevronLeft className="w-6 h-6 group-hover/nav:scale-110 transition-transform" />
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-md hover:bg-white text-black p-4 rounded-full transition-all shadow-xl border border-gray-100 group/nav"
+                                            aria-label="Next image"
+                                        >
+                                            <ChevronRight className="w-6 h-6 group-hover/nav:scale-110 transition-transform" />
+                                        </button>
                                     </>
                                 )}
                             </div>
+
                             <div className="grid grid-cols-4 gap-4">
                                 {images.map((img: any, idx: number) => (
                                     <button
@@ -202,8 +205,13 @@ export default function ProductDetailClient({ product, similarProducts = [] }: P
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-4 mb-4">
+                                <div className="flex items-center gap-4 mb-2">
                                     <span className="text-2xl font-light text-text-main-light">R {Number(product.basePrice).toLocaleString()}</span>
+                                </div>
+
+                                {/* HappyPay BNPL widget */}
+                                <div className="mb-4">
+                                    <HappyPayWidget amount={Number(product.basePrice)} layout="peach" />
                                 </div>
 
                                 <p className="text-gray-500 text-sm leading-relaxed font-light italic">

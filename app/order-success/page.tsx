@@ -5,11 +5,20 @@ import Footer from '../components/Footer';
 import Link from 'next/link';
 import { CheckCircle, Package, ArrowRight, Mail } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
+import { useCart } from '../../context/CartContext';
 
 function SuccessContent() {
     const searchParams = useSearchParams();
     const orderNumber = searchParams.get('orderNumber');
+    const { clearCart } = useCart();
+
+    // Clear cart on first render of success page
+    // (Payfast redirects here directly — the cart wasn't cleared in the payment page)
+    useEffect(() => {
+        clearCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="max-w-3xl mx-auto px-4 py-24 text-center">
@@ -19,31 +28,37 @@ function SuccessContent() {
                 </div>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-serif text-text-main-light mb-6 tracking-tight">Thank You for Your Order</h1>
+            <h1 className="text-4xl md:text-5xl font-serif text-text-main-light mb-6 tracking-tight">
+                Thank You for Your Order
+            </h1>
             <p className="text-lg text-gray-500 font-light mb-12 leading-relaxed">
                 Your order <span className="font-bold text-text-main-light">#{orderNumber}</span> has been successfully placed.
-                We've sent a confirmation email to your inbox with all details.
+                We&apos;ve sent a confirmation email to your inbox with all details.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
                 <div className="bg-surface-light p-8 border border-gray-100 flex flex-col items-center text-center space-y-3">
                     <Package className="w-6 h-6 text-primary" />
                     <h3 className="text-sm font-bold uppercase tracking-widest">Order Processing</h3>
-                    <p className="text-xs text-gray-400 font-light leading-relaxed">Your artisan pieces are now being carefully prepared and packaged for shipment.</p>
+                    <p className="text-xs text-gray-400 font-light leading-relaxed">
+                        Your artisan pieces are now being carefully prepared and packaged for shipment.
+                    </p>
                 </div>
                 <div className="bg-surface-light p-8 border border-gray-100 flex flex-col items-center text-center space-y-3">
                     <Mail className="w-6 h-6 text-primary" />
                     <h3 className="text-sm font-bold uppercase tracking-widest">Confirmation Sent</h3>
-                    <p className="text-xs text-gray-400 font-light leading-relaxed">A detailed invoice and tracking information have been sent to your email.</p>
+                    <p className="text-xs text-gray-400 font-light leading-relaxed">
+                        A detailed invoice and tracking information have been sent to your email.
+                    </p>
                 </div>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Link
-                    href="/"
+                    href="/account/orders"
                     className="bg-text-main-light text-white px-10 py-5 uppercase text-[11px] tracking-[0.2em] font-bold hover:bg-primary transition-all duration-500 shadow-lg min-w-[200px]"
                 >
-                    Back to Home
+                    View My Orders
                 </Link>
                 <Link
                     href="/women"

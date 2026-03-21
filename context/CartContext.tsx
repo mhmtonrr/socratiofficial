@@ -24,6 +24,8 @@ interface CartContextType {
     clearCart: () => void;
     cartCount: number;
     cartTotal: number;
+    isCartOpen: boolean;
+    setIsCartOpen: (open: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -32,6 +34,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [isInitialized, setIsInitialized] = useState(false);
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     // Dynamic storage key based on user ID
     const STORAGE_KEY = useMemo(() => {
@@ -41,21 +44,52 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return 'socrati_cart_guest';
     }, [session, status]);
 
-    // Load from localStorage whenever the storage key (user) changes
+    // Load cart from localStorage whenever the user changes (login/logout)
+    // Also merges the guest cart into the user cart on sign-in
     useEffect(() => {
+        if (status === 'loading') return; // wait for session to resolve
+
+        const GUEST_KEY = 'socrati_cart_guest';
         const savedCart = localStorage.getItem(STORAGE_KEY);
-        if (savedCart) {
-            try {
-                setCartItems(JSON.parse(savedCart));
-            } catch (e) {
-                console.error('Failed to parse cart', e);
-                setCartItems([]);
-            }
-        } else {
-            setCartItems([]);
+        let userItems: CartItem[] = [];
+
+        try {
+            userItems = savedCart ? JSON.parse(savedCart) : [];
+        } catch {
+            userItems = [];
         }
+
+        // If the user just logged in, merge guest cart into user cart
+        if (status === 'authenticated') {
+            const rawGuest = localStorage.getItem(GUEST_KEY);
+            if (rawGuest) {
+                try {
+                    const guestItems: CartItem[] = JSON.parse(rawGuest);
+                    if (guestItems.length > 0) {
+                        // Merge: sum quantities for duplicate items, append new ones
+                        const merged = [...userItems];
+                        for (const guestItem of guestItems) {
+                            const existing = merged.find(i => i.id === guestItem.id);
+                            if (existing) {
+                                existing.quantity += guestItem.quantity;
+                            } else {
+                                merged.push(guestItem);
+                            }
+                        }
+                        userItems = merged;
+                    }
+                } catch {
+                    // ignore corrupt guest cart
+                }
+                // Clear guest cart after merging
+                localStorage.removeItem(GUEST_KEY);
+            }
+        }
+
+        setCartItems(userItems);
         setIsInitialized(true);
-    }, [STORAGE_KEY]);
+    }, [STORAGE_KEY, status]);
+
 
     // Save to localStorage whenever cart changes
     useEffect(() => {
@@ -76,6 +110,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             }
             return [...prev, newItem];
         });
+        // Auto-open cart drawer when item is added
+        setIsCartOpen(true);
     }, []);
 
     const removeItem = useCallback((id: string) => {
@@ -109,6 +145,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 clearCart,
                 cartCount,
                 cartTotal,
+                isCartOpen,
+                setIsCartOpen,
             }}
         >
             {children}

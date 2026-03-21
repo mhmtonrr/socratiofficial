@@ -1,0 +1,75 @@
+feat: payment gateway integration, guest checkout rework & dev setup improvements
+
+## Payment Integrations
+
+### Peach Payments (Embedded Checkout)
+- Add lib/peach.ts — OAuth token fetch + POST /v2/checkout session creation
+- Add app/api/orders/peach/initiate/route.ts — order creation + Peach checkout session initiation
+- Add app/api/peach/notify/route.ts — webhook handler; verifies HMAC-SHA256 signature,
+  updates order/payment status, decrements stock on success
+- Add app/components/PeachCheckout.tsx — client-side embedded checkout component;
+  loads Peach SDK lazily, handles onCompleted/onCancelled/onExpired/onError events
+- Add PEACH_* env vars to .env.local and .env.example
+
+### PayFast (existing — no breaking changes)
+- Redirect flow unchanged
+
+### Shared Checkout UI
+- Replace static PayFast payment card with dual payment method selector (radio cards)
+- Checkout button label updates dynamically: "Pay with PayFast" / "Pay with Peach Payments"
+- Update Visa and Mastercard icons to Brandfetch CDN SVGs
+
+### HappyPay BNPL Widget
+- Add app/components/HappyPayWidget.tsx — dynamic script injection, peach/peach2 layouts
+- Embed widget on product detail pages (below price)
+- Embed widget on checkout page and order summary sidebar
+
+## Checkout Flow Rework
+
+### Guest Checkout with Account Creation
+- Guest users must supply a password at checkout — account created on order placement
+- Removed anonymous/guest order support (all orders require an account)
+- app/api/orders/initiate/route.ts — restored guest account creation logic
+- app/api/orders/peach/initiate/route.ts — same logic for Peach flow
+
+### Login Redirect Back to Checkout
+- app/login/page.tsx — reads ?redirect= query param; returns user to /payment after sign-in
+- Cart Drawer — removed "Sign In to Continue" gate; replaced with simple "Secure Checkout" CTA
+
+### Cart Persistence (localStorage)
+- context/CartContext.tsx — cart persisted per user key (socrati_cart_guest / socrati_cart_<userId>)
+- Guest cart auto-merges into user cart on sign-in (quantities summed for duplicates)
+- app/order-success/page.tsx — cart cleared on mount after successful payment
+
+## Address Improvements
+- Add "Address Line 2 (Optional)" field to checkout form
+- Address Line 2 persisted to Address model on both initiate routes
+- Google Maps address autocomplete integrated on checkout (AddressAutocomplete component)
+- app/api/orders/initiate/route.ts — addressLine2 saved to user address book
+- Verified: addressLine2 already present as optional field in schema.prisma
+
+## Admin Dashboard
+- Add app/admin/payments/page.tsx — full payment transaction list
+  - Stats: total revenue, pending count, failed count
+  - Search by order number, email, transaction ID
+  - Filter by status (All / Completed / Pending / Failed)
+  - Shows provider, PF/Peach transaction ID, Member vs Guest badge
+  - Links to order and customer detail
+- app/admin/orders/page.tsx — orders linked with payment status
+
+## API Routes Added
+- POST /api/orders/peach/initiate
+- POST /api/peach/notify
+- GET  /api/admin/payments
+
+## Bug Fixes
+- Fix OrderItem field: name → productName (schema snapshot field)
+- Fix OrderItem: remove non-existent productId field (only variantId is tracked)
+- Fix peach/notify: payments → payment (singular one-to-one relation in schema)
+- Fix checkout button: was hardcoded "Pay with Payfast" regardless of selected method
+
+## Dev Setup & Documentation
+- Rewrite README.md — prerequisites, Docker DB setup, migrations, seed instructions,
+  default admin credentials, ngrok webhook setup, all URL routes, project structure
+- Add .env.example — all env vars with placeholder values and source comments
+- Update .gitignore — .env* blocked, !.env.example allowed through

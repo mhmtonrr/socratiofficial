@@ -65,7 +65,7 @@ export default function UserOrdersPage() {
                                         </div>
                                         <div>
                                             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total</p>
-                                            <p className="text-xs font-bold font-serif">${Number(order.totalAmount).toLocaleString()}</p>
+                                            <p className="text-xs font-bold font-serif">R {Number(order.totalAmount).toLocaleString()}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-6">
@@ -109,8 +109,8 @@ export default function UserOrdersPage() {
                                                             </div>
                                                         </div>
                                                         <div className="text-right">
-                                                            <p className="font-bold font-serif text-sm">${Number(item.totalPrice).toLocaleString()}</p>
-                                                            <p className="text-[9px] text-gray-400 uppercase tracking-widest mt-1">${Number(item.unitPrice).toLocaleString()} / unit</p>
+                                                            <p className="font-bold font-serif text-sm">R {Number(item.totalPrice).toLocaleString()}</p>
+                                                            <p className="text-[9px] text-gray-400 uppercase tracking-widest mt-1">R {Number(item.unitPrice).toLocaleString()} / unit</p>
                                                         </div>
                                                     </div>
                                                 );
@@ -129,15 +129,15 @@ export default function UserOrdersPage() {
                                             <div className="text-right">
                                                 <div className="flex justify-between md:justify-end gap-10 text-xs mb-2">
                                                     <span className="text-gray-400">Subtotal:</span>
-                                                    <span className="font-medium">${(Number(order.totalAmount) - Number(order.shippingCost)).toLocaleString()}</span>
+                                                    <span className="font-medium">R {(Number(order.totalAmount) - Number(order.shippingCost)).toLocaleString()}</span>
                                                 </div>
                                                 <div className="flex justify-between md:justify-end gap-10 text-xs mb-2">
                                                     <span className="text-gray-400">Shipping:</span>
-                                                    <span className="font-medium">${Number(order.shippingCost).toLocaleString()}</span>
+                                                    <span className="font-medium">R {Number(order.shippingCost).toLocaleString()}</span>
                                                 </div>
                                                 <div className="flex justify-between md:justify-end gap-10 text-sm font-bold pt-2 border-t border-gray-100">
                                                     <span>Total:</span>
-                                                    <span className="text-primary font-serif">${Number(order.totalAmount).toLocaleString()}</span>
+                                                    <span className="text-primary font-serif">R {Number(order.totalAmount).toLocaleString()}</span>
                                                 </div>
                                             </div>
                                         </div>
