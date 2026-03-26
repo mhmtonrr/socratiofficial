@@ -26,6 +26,10 @@ interface CartContextType {
     cartTotal: number;
     isCartOpen: boolean;
     setIsCartOpen: (open: boolean) => void;
+    couponCode: string | null;
+    discountAmount: number;
+    applyCoupon: (code: string, discount: number) => void;
+    removeCoupon: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -35,6 +39,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [isInitialized, setIsInitialized] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const [couponCode, setCouponCode] = useState<string | null>(null);
+    const [discountAmount, setDiscountAmount] = useState<number>(0);
 
     // Dynamic storage key based on user ID
     const STORAGE_KEY = useMemo(() => {
@@ -130,6 +136,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     const clearCart = useCallback(() => {
         setCartItems([]);
+        setCouponCode(null);
+        setDiscountAmount(0);
+    }, []);
+
+    const applyCoupon = useCallback((code: string, discount: number) => {
+        setCouponCode(code);
+        setDiscountAmount(discount);
+    }, []);
+
+    const removeCoupon = useCallback(() => {
+        setCouponCode(null);
+        setDiscountAmount(0);
     }, []);
 
     const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -147,6 +165,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 cartTotal,
                 isCartOpen,
                 setIsCartOpen,
+                couponCode,
+                discountAmount,
+                applyCoupon,
+                removeCoupon
             }}
         >
             {children}

@@ -9,6 +9,7 @@ export default async function AccessoriesPage() {
     // Current requirement: "We won't sell accessories initially", but page should exist.
     const products = await prisma.product.findMany({
         where: {
+            isActive: true,
             OR: [
                 { category: { slug: 'accessories' } },
                 { category: { slug: 'men-accessories' } }
@@ -40,7 +41,7 @@ export default async function AccessoriesPage() {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
                         {products.map((product) => (
-                            <Link key={product.id} href={`/product/${product.id}`} className="group cursor-pointer">
+                            <Link key={product.id} href={`/product/${product.slug}`} className="group cursor-pointer">
                                 <div className="relative overflow-hidden bg-[#F9F9F9] aspect-[4/5] mb-6">
                                     {product.images[0] && (
                                         <Image

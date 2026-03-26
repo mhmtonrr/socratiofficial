@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Check } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirectTo = searchParams.get('redirect') || '/';
@@ -108,23 +109,8 @@ export default function LoginPage() {
             if (!res.ok) {
                 setRegErrors({ general: data.error || 'Registration failed' });
             } else {
-                // Auto sign in after successful registration
-                const signInResult = await signIn('credentials', {
-                    redirect: false,
-                    email: regEmail,
-                    password: regPassword,
-                });
-
-                if (signInResult?.ok) {
-                    setSuccessMessage(`Welcome, ${regFirstName}! Your account has been created and you are now signed in.`);
-                    setTimeout(() => {
-                        router.push('/');
-                        router.refresh();
-                    }, 2000);
-                } else {
-                    // Account created but auto-login failed — still show success
-                    setSuccessMessage('Account created successfully! Please sign in below.');
-                }
+                // Removed auto sign-in since user needs verification
+                setSuccessMessage('Account created! Please check your email to verify your account before logging in.');
             }
         } catch (error) {
             setRegErrors({ general: 'An unexpected error occurred' });
@@ -175,7 +161,7 @@ export default function LoginPage() {
                                     {loginErrors.password && <p className="text-rose-500 text-[9px] uppercase tracking-widest mt-2 italic">{loginErrors.password}</p>}
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <a href="#" className="text-[10px] uppercase tracking-widest text-gray-400 hover:text-primary transition-colors underline underline-offset-4">Forgot your password?</a>
+                                    <Link href="/forgot-password" className="text-[10px] uppercase tracking-widest text-gray-400 hover:text-primary transition-colors underline underline-offset-4">Forgot your password?</Link>
                                 </div>
                                 <button
                                     disabled={loginLoading}
@@ -275,5 +261,21 @@ export default function LoginPage() {
             </main>
             <Footer />
         </>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <>
+                <Header />
+                <div className="min-h-screen bg-white flex items-center justify-center">
+                    <div className="animate-pulse text-[10px] uppercase tracking-widest text-gray-400">Loading...</div>
+                </div>
+                <Footer />
+            </>
+        }>
+            <LoginContent />
+        </Suspense>
     );
 }

@@ -34,6 +34,14 @@ export const authOptions: NextAuthOptions = {
                     throw new Error("Invalid credentials");
                 }
 
+                if (user.isSuspended) {
+                    throw new Error("Your account has been suspended by an administrator.");
+                }
+
+                if (!user.isVerified) {
+                    throw new Error("Please verify your email address to log in. Check your inbox.");
+                }
+
                 const isValid = await bcrypt.compare(credentials.password, user.password);
 
                 if (!isValid) {

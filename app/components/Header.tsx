@@ -289,7 +289,7 @@ function HeaderContent() {
                                     searchResults.map((product) => (
                                         <Link
                                             key={product.id}
-                                            href={`/product/${product.id}`}
+                                            href={`/product/${product.slug || product.name}`}
                                             onClick={() => setIsSearchOpen(false)}
                                             className="flex items-center gap-4 group"
                                         >

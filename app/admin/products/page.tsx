@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Plus, Search, Filter, MoreVertical, Edit, Trash2, Package, Archive, AlertCircle, ChevronDown, Check, X, Download } from 'lucide-react';
+import { Plus, Search, Filter, MoreVertical, Edit, Trash2, Package, Archive, AlertCircle, ChevronDown, Check, X, Download, Copy, Eye, EyeOff } from 'lucide-react';
 
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<any[]>([]);
@@ -103,11 +103,41 @@ export default function AdminProductsPage() {
         setSelectedIds(prev => prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]);
     };
 
-    const handleBulkDelete = async () => {
-        if (!confirm(`Are you sure you want to archive ${selectedIds.length} models?`)) return;
-        // In a real app, you'd have a bulk delete API
-        alert("Bulk archive requested for: " + selectedIds.join(', '));
+    const handleBulkAction = async (action: 'activate' | 'deactivate' | 'delete') => {
+        if (!confirm(`Are you sure you want to ${action} ${selectedIds.length} models?`)) return;
+        
+        try {
+            const res = await fetch(`/api/admin/products/bulk`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, ids: selectedIds }),
+            });
+            if (res.ok) {
+                if (action === 'delete') {
+                    setProducts(products.filter(p => !selectedIds.includes(p.id)));
+                } else {
+                    setProducts(products.map(p => selectedIds.includes(p.id) ? { ...p, isActive: action === 'activate' } : p));
+                }
+                setSelectedIds([]);
+            }
+        } catch (error) {
+            console.error("Bulk action error:", error);
+        }
         setShowActions(false);
+    };
+
+    const handleDuplicate = async (id: string) => {
+        if (!confirm('Duplicate this masterpiece? The copy will be created as "Draft" (inactive).')) return;
+        
+        try {
+            const res = await fetch(`/api/admin/products/${id}/duplicate`, { method: 'POST' });
+            if (res.ok) {
+                const newProduct = await res.json();
+                fetchProducts(); // Refresh to get all populated details
+            }
+        } catch (error) {
+            console.error('Duplicate error:', error);
+        }
     };
 
     const getDescendantCategoryIds = (catId: string): string[] => {
@@ -243,7 +273,21 @@ export default function AdminProductsPage() {
                                         <Download className="w-4 h-4" /> Export Gallery
                                     </button>
                                     <button
-                                        onClick={handleBulkDelete}
+                                        onClick={() => handleBulkAction('activate')}
+                                        disabled={selectedIds.length === 0}
+                                        className="w-full p-4 rounded-xl hover:bg-emerald-500/10 text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all text-left text-emerald-400 disabled:opacity-30 disabled:cursor-not-allowed"
+                                    >
+                                        <Eye className="w-4 h-4" /> Publish Selection ({selectedIds.length})
+                                    </button>
+                                    <button
+                                        onClick={() => handleBulkAction('deactivate')}
+                                        disabled={selectedIds.length === 0}
+                                        className="w-full p-4 rounded-xl hover:bg-amber-500/10 text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all text-left text-amber-400 disabled:opacity-30 disabled:cursor-not-allowed"
+                                    >
+                                        <EyeOff className="w-4 h-4" /> Deactivate Selection ({selectedIds.length})
+                                    </button>
+                                    <button
+                                        onClick={() => handleBulkAction('delete')}
                                         disabled={selectedIds.length === 0}
                                         className="w-full p-4 rounded-xl hover:bg-rose-500/10 text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all text-left text-rose-400 disabled:opacity-30 disabled:cursor-not-allowed"
                                     >
@@ -343,8 +387,9 @@ export default function AdminProductsPage() {
                                                             {isOutOfStock ? 'Depleted' : isLowStock ? 'Vulnerable' : 'Healthy'}
                                                         </span>
                                                     </div>
-                                                    <div className="text-[10px] font-bold text-gray-400 tabular-nums">
-                                                        {totalStock} Units in Atelier
+                                                    <div className="text-[10px] font-bold text-gray-400 flex items-center gap-2">
+                                                        {totalStock} Units 
+                                                        {!product.isActive && <span className="bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full text-[8px] uppercase tracking-widest">Draft</span>}
                                                     </div>
                                                 </div>
                                             </td>
@@ -356,11 +401,19 @@ export default function AdminProductsPage() {
                                             <td className="px-10 py-8 text-right">
                                                 <div className="flex justify-end gap-3 opacity-0 lg:group-hover:opacity-100 transition-all transform translate-x-2 lg:group-hover:translate-x-0">
                                                     <Link
-                                                        href={`/admin/products/edit/${product.id}`}
+                                                        href={`/admin/products/edit/${product.name}`}
                                                         className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all"
+                                                        title="Edit Details"
                                                     >
                                                         <Edit className="w-4 h-4" />
                                                     </Link>
+                                                    <button
+                                                        onClick={() => handleDuplicate(product.id)}
+                                                        className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all"
+                                                        title="Duplicate Masterpiece"
+                                                    >
+                                                        <Copy className="w-4 h-4" />
+                                                    </button>
                                                     <button
                                                         onClick={() => handleDelete(product.id)}
                                                         className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-rose-500 hover:border-rose-100 hover:shadow-lg transition-all"
@@ -439,12 +492,18 @@ export default function AdminProductsPage() {
                                         </div>
 
                                         <div className="flex gap-3 pt-4 border-t border-gray-50">
-                                            <Link
-                                                href={`/admin/products/edit/${product.id}`}
-                                                className="flex-grow py-3 bg-gray-50 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-primary/5 hover:text-primary transition-all border border-transparent active:border-primary/10"
-                                            >
-                                                <Edit className="w-4 h-4" /> Edit Model
-                                            </Link>
+                                                <Link
+                                                    href={`/admin/products/edit/${product.name}`}
+                                                    className="flex-grow py-3 bg-gray-50 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-primary/5 hover:text-primary transition-all border border-transparent active:border-primary/10"
+                                                >
+                                                    <Edit className="w-4 h-4" /> Edit
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDuplicate(product.id)}
+                                                    className="w-14 h-12 flex items-center justify-center bg-gray-50 rounded-xl text-gray-400 hover:bg-primary/5 hover:text-primary transition-all border border-transparent"
+                                                >
+                                                    <Copy className="w-4 h-4" />
+                                                </button>
                                             <button
                                                 onClick={() => handleDelete(product.id)}
                                                 className="w-14 h-12 flex items-center justify-center bg-gray-50 rounded-xl text-rose-400 hover:bg-rose-500/5 transition-all border border-transparent"

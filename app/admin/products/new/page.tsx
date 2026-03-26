@@ -3,14 +3,17 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Plus, X, Upload, Save, Eye, Package, Image as ImageIcon, Sparkles, Ruler, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, Plus, X, Upload, Save, Eye, Package, Image as ImageIcon, Sparkles, Ruler, ShieldCheck, Library, GripVertical } from 'lucide-react';
 import Link from 'next/link';
+import MediaPickerModal from '@/app/components/admin/MediaPickerModal';
 
 export default function NewProductPage() {
     const router = useRouter();
     const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState<number | null>(null);
+    const [mediaPickerOpen, setMediaPickerOpen] = useState<{ open: boolean; index: number | null }>({ open: false, index: null });
+    const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -19,6 +22,10 @@ export default function NewProductPage() {
         description: '',
         basePrice: '',
         categoryId: '',
+        tags: '',
+        salePrice: '',
+        saleStartDate: '',
+        saleEndDate: '',
         details: ['Luxury Craftsmanship', 'Hand-stitched in Italy'],
         care: 'Professional leather clean recommended.',
         images: [{ url: '', isMain: true }],
@@ -67,6 +74,20 @@ export default function NewProductPage() {
         const newImages = [...formData.images];
         newImages[index].url = value;
         setFormData(prev => ({ ...prev, images: newImages }));
+    };
+
+    const handleDragStart = (idx: number) => setDraggedItemIndex(idx);
+    
+    const handleDragEnter = (targetIdx: number) => {
+        if (draggedItemIndex === null || draggedItemIndex === targetIdx) return;
+        setFormData(prev => {
+            const items = [...prev.images];
+            const draggedItem = items[draggedItemIndex];
+            items.splice(draggedItemIndex, 1);
+            items.splice(targetIdx, 0, draggedItem);
+            return { ...prev, images: items };
+        });
+        setDraggedItemIndex(targetIdx);
     };
 
     const handleFileUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,6 +156,10 @@ export default function NewProductPage() {
                 body: JSON.stringify({
                     ...formData,
                     basePrice: Number(formData.basePrice),
+                    salePrice: formData.salePrice ? Number(formData.salePrice) : null,
+                    saleStartDate: formData.saleStartDate ? new Date(formData.saleStartDate).toISOString() : null,
+                    saleEndDate: formData.saleEndDate ? new Date(formData.saleEndDate).toISOString() : null,
+                    tags: formData.tags.split(',').map((t: string) => t.trim()).filter(Boolean),
                     variants: formData.variants.map(v => ({
                         ...v,
                         stock: Number(v.stock),
@@ -250,6 +275,60 @@ export default function NewProductPage() {
                                 </div>
                             </div>
                             <div className="space-y-3">
+                                <label className="text-[10px] uppercase tracking-[0.2em] text-rose-400 font-black pl-1">Sale Price (Optional)</label>
+                                <div className="relative">
+                                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-rose-300 font-black text-sm">R</span>
+                                    <input
+                                        name="salePrice"
+                                        value={formData.salePrice}
+                                        onChange={handleChange}
+                                        type="number"
+                                        placeholder="0.00"
+                                        className="w-full pl-10 pr-6 py-4 rounded-2xl border-2 border-rose-50/50 bg-rose-50/30 text-sm font-black text-rose-500 focus:border-rose-200 focus:bg-white outline-none transition-all placeholder:text-rose-200"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {formData.salePrice && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+                                <div className="space-y-3">
+                                    <label className="text-[10px] uppercase tracking-[0.2em] text-rose-400 font-black pl-1">Sale Start</label>
+                                    <input
+                                        name="saleStartDate"
+                                        value={formData.saleStartDate}
+                                        onChange={handleChange}
+                                        type="datetime-local"
+                                        className="w-full px-6 py-4 rounded-2xl border-2 border-rose-50/50 bg-rose-50/30 text-sm font-medium focus:border-rose-200 focus:bg-white outline-none transition-all text-text-main-light"
+                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-[10px] uppercase tracking-[0.2em] text-rose-400 font-black pl-1">Sale End</label>
+                                    <input
+                                        name="saleEndDate"
+                                        value={formData.saleEndDate}
+                                        onChange={handleChange}
+                                        type="datetime-local"
+                                        className="w-full px-6 py-4 rounded-2xl border-2 border-rose-50/50 bg-rose-50/30 text-sm font-medium focus:border-rose-200 focus:bg-white outline-none transition-all text-text-main-light"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                            <div className="space-y-3">
+                                <label className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-black pl-1 flex items-center gap-2">
+                                    Tags / Labels <span className="text-[8px] font-normal normal-case opacity-50">(comma separated)</span>
+                                </label>
+                                <input
+                                    name="tags"
+                                    value={formData.tags}
+                                    onChange={handleChange}
+                                    placeholder="e.g. New Arrival, Bestseller, Summer"
+                                    className="w-full px-6 py-4 rounded-2xl border-2 border-gray-50 bg-gray-50/30 text-sm font-medium focus:border-primary/20 focus:bg-white outline-none transition-all placeholder:text-gray-300"
+                                />
+                            </div>
+                            <div className="space-y-3">
                                 <label className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-black pl-1">Boutique Category</label>
                                 <select
                                     name="categoryId"
@@ -287,7 +366,18 @@ export default function NewProductPage() {
 
                         <div className="grid grid-cols-1 gap-6">
                             {formData.images.map((img, idx) => (
-                                <div key={idx} className="flex flex-col md:flex-row gap-6 p-6 rounded-3xl border-2 border-dashed border-gray-100 hover:border-primary/20 transition-all bg-gray-50/20 group/img">
+                                <div 
+                                    key={idx} 
+                                    draggable
+                                    onDragStart={() => handleDragStart(idx)}
+                                    onDragEnter={() => handleDragEnter(idx)}
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDragEnd={() => setDraggedItemIndex(null)}
+                                    className={`flex flex-col md:flex-row gap-6 p-6 rounded-3xl border-2 transition-all bg-gray-50/20 group/img ${draggedItemIndex === idx ? 'opacity-50 border-primary scale-[0.98]' : 'border-dashed border-gray-100 hover:border-primary/20'}`}
+                                >
+                                    <div className="flex flex-col items-center justify-center p-2 text-gray-300 hover:text-primary cursor-grab active:cursor-grabbing">
+                                        <GripVertical className="w-5 h-5" />
+                                    </div>
                                     <div className="w-full md:w-32 h-32 rounded-2xl bg-gray-100 flex-shrink-0 relative overflow-hidden border border-gray-100">
                                         {img.url ? (
                                             <img src={img.url} className="w-full h-full object-cover" alt="Preview" />
@@ -328,7 +418,7 @@ export default function NewProductPage() {
                                                     <div className="w-full px-6 py-3 rounded-xl border-2 border-dashed border-gray-100 group-hover/upload:border-primary/20 group-hover/upload:bg-white transition-all flex items-center justify-center gap-2 text-gray-400 group-hover/upload:text-primary">
                                                         <Upload className={`w-4 h-4 ${uploading === idx ? 'animate-bounce' : ''}`} />
                                                         <span className="text-[10px] font-black uppercase tracking-widest">
-                                                            {uploading === idx ? 'Uploading...' : 'Upload from Local Studio'}
+                                                            {uploading === idx ? 'Uploading...' : 'Upload File'}
                                                         </span>
                                                     </div>
                                                     <input
@@ -339,6 +429,14 @@ export default function NewProductPage() {
                                                         disabled={uploading !== null}
                                                     />
                                                 </label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setMediaPickerOpen({ open: true, index: idx })}
+                                                    className="px-6 py-3 rounded-xl border border-gray-200 hover:bg-white hover:border-primary/20 hover:text-primary transition-all flex items-center gap-2 text-gray-400 group/lib"
+                                                >
+                                                    <Library className="w-4 h-4" />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest pointer-events-none">Media Vault</span>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -454,6 +552,16 @@ export default function NewProductPage() {
                     </section>
                 </div>
             </div>
+            
+            <MediaPickerModal 
+                isOpen={mediaPickerOpen.open} 
+                onClose={() => setMediaPickerOpen({ open: false, index: null })} 
+                onSelect={(url) => {
+                    if (mediaPickerOpen.index !== null) {
+                        handleImageChange(mediaPickerOpen.index, url);
+                    }
+                }} 
+            />
         </form>
     );
 }

@@ -124,6 +124,9 @@ export function buildPayfastFormData(params: {
     // Amount must be formatted to exactly 2 decimal places
     const formattedAmount = amount.toFixed(2);
 
+    // Sanitize phone number (digits only)
+    const sanitizedPhone = phone ? phone.replace(/\D/g, '') : undefined;
+
     // Build data IN THE EXACT ORDER specified by Payfast docs
     const data: Record<string, string> = {
         // Merchant details
@@ -136,7 +139,7 @@ export function buildPayfastFormData(params: {
         name_first: firstName,
         name_last: lastName,
         email_address: email,
-        ...(phone ? { cell_number: phone } : {}),
+        ...(sanitizedPhone ? { cell_number: sanitizedPhone } : {}),
         // Transaction details
         m_payment_id: orderNumber,
         amount: formattedAmount,

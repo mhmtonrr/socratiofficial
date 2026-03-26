@@ -3,7 +3,7 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Image from 'next/image';
-import { Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Lock, AlertCircle, Eye, EyeOff, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useCart } from '../../context/CartContext';
 import { useRouter } from 'next/navigation';
@@ -14,13 +14,18 @@ import PeachCheckout from '../components/PeachCheckout';
 
 export default function PaymentPage() {
     const { data: session, status: sessionStatus } = useSession();
-    const { cartItems, cartTotal, cartCount } = useCart();
+    const { cartItems, cartTotal, cartCount, couponCode, discountAmount, applyCoupon, removeCoupon } = useCart();
     const router = useRouter();
     const [shippingMethod, setShippingMethod] = useState('standard');
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [paymentMethod, setPaymentMethod] = useState<'payfast' | 'peach'>('payfast');
     const [peachData, setPeachData] = useState<{ checkoutId: string; orderNumber: string } | null>(null);
+
+    // Coupon state
+    const [couponInput, setCouponInput] = useState('');
+    const [couponError, setCouponError] = useState('');
+    const [isApplying, setIsApplying] = useState(false);
 
     // Contact form
     const [formData, setFormData] = useState({
@@ -139,13 +144,40 @@ export default function PaymentPage() {
         return Object.keys(newErrors).length === 0;
     };
 
+    const handleApplyCoupon = async () => {
+        if (!couponInput.trim()) return;
+        setCouponError('');
+        setIsApplying(true);
+
+        try {
+            const res = await fetch('/api/cart/apply-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: couponInput.trim(), cartTotal }),
+            });
+            const data = await res.json();
+            
+            if (!res.ok) {
+                setCouponError(data.error || 'Invalid coupon code');
+            } else {
+                applyCoupon(data.coupon.code, data.discountAmount);
+                setCouponInput('');
+            }
+        } catch (error) {
+            setCouponError('An unexpected error occurred');
+        } finally {
+            setIsApplying(false);
+        }
+    };
+
     const subtotal = cartTotal;
+    // Calculate standard shipping taking subtotal AFTER discount into account? Or before? Usually before discount.
     const standardShippingFee = subtotal > 5000 ? 0 : 250;
     const shipping =
         shippingMethod === 'express' ? 450
             : shippingMethod === 'overnight' ? 650
                 : standardShippingFee;
-    const total = subtotal + shipping;
+    const total = Math.max(0, subtotal - discountAmount) + shipping;
 
     // ── Shared contact payload builder ──────────────────────────────────────
     const buildContactPayload = () => ({
@@ -165,6 +197,8 @@ export default function PaymentPage() {
         createAccount: !session,
         password: !session ? password : undefined,
         saveAddress: session ? saveAddress : false,
+        couponCode,
+        discountAmount,
     });
 
     const handleCheckout = async () => {
@@ -590,7 +624,39 @@ export default function PaymentPage() {
                                         <span className="text-text-muted-light">Subtotal</span>
                                         <span className="text-text-main-light font-medium">R {subtotal.toLocaleString()}</span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
+                                    {couponCode ? (
+                                        <div className="flex justify-between text-sm items-center">
+                                            <span className="text-emerald-600 font-medium flex items-center gap-2">
+                                                Discount ({couponCode})
+                                                <button onClick={removeCoupon} className="text-rose-500 hover:text-rose-700 ml-1" title="Remove coupon">
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </span>
+                                            <span className="text-emerald-600 font-medium">-R {discountAmount.toLocaleString()}</span>
+                                        </div>
+                                    ) : (
+                                        <div className="pt-2 flex items-start gap-2">
+                                            <div className="flex-grow">
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="Voucher/Promo Code" 
+                                                    value={couponInput}
+                                                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                                                    className="w-full border border-gray-300 px-3 py-2 text-xs uppercase tracking-widest focus:outline-none focus:border-text-main-light"
+                                                    disabled={loading || !!peachData}
+                                                />
+                                                {couponError && <p className="text-rose-500 text-[10px] mt-1 uppercase tracking-widest italic">{couponError}</p>}
+                                            </div>
+                                            <button 
+                                                onClick={handleApplyCoupon}
+                                                disabled={isApplying || !couponInput.trim() || loading || !!peachData}
+                                                className="bg-gray-100 text-text-main-light px-4 py-2 text-xs uppercase tracking-widest font-bold hover:bg-gray-200 transition-colors disabled:opacity-50"
+                                            >
+                                                {isApplying ? '...' : 'Apply'}
+                                            </button>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between text-sm pt-2">
                                         <span className="text-text-muted-light">Shipping</span>
                                         <span className="text-text-main-light font-medium">{shipping === 0 ? 'Free' : `R ${shipping.toLocaleString()}`}</span>
                                     </div>

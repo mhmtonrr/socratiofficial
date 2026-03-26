@@ -39,7 +39,7 @@ export default function AdminPaymentsPage() {
     const [payments, setPayments] = useState<Payment[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
-    const [statusFilter, setStatusFilter] = useState('ALL');
+    const [statusFilter, setStatusFilter] = useState('COMPLETED');
 
     useEffect(() => {
         fetchPayments();

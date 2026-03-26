@@ -2,8 +2,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ShoppingBag, Eye, CheckCircle, Truck, Package, XCircle, MoreVertical } from 'lucide-react';
+import { ShoppingBag, Eye, CheckCircle, Truck, Package, XCircle, MoreVertical, Trash2 } from 'lucide-react';
 import Image from 'next/image';
+import { toast } from 'react-hot-toast';
 
 type OrderItem = {
     id: string;
@@ -89,6 +90,24 @@ export default function AdminOrdersPage() {
         }
     };
 
+    const cleanupOldOrders = async () => {
+        if (!confirm('Are you sure you want to cancel all pending orders older than 24 hours?')) return;
+        
+        try {
+            const res = await fetch('/api/admin/orders/cleanup', { method: 'POST' });
+            const data = await res.json();
+            if (res.ok) {
+                toast.success(data.message || 'Cleanup successful');
+                fetchOrders();
+            } else {
+                toast.error(data.error || 'Cleanup failed');
+            }
+        } catch (error) {
+            console.error('Error cleaning up orders:', error);
+            toast.error('Connection error');
+        }
+    };
+
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'PENDING': return 'bg-amber-50 text-amber-700 border-amber-100';
@@ -116,12 +135,21 @@ export default function AdminOrdersPage() {
     return (
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-serif text-text-main-light mb-2 font-medium">Orders Management</h1>
-                    <p className="text-xs text-gray-400 uppercase tracking-widest">Track and manage customer orders</p>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <div>
+                        <h1 className="text-2xl font-serif text-text-main-light mb-2 font-medium">Orders Management</h1>
+                        <p className="text-xs text-gray-400 uppercase tracking-widest">Track and manage customer orders</p>
+                    </div>
+                    <button
+                        onClick={cleanupOldOrders}
+                        className="flex items-center gap-2 px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-rose-500 border border-rose-100 bg-rose-50/50 hover:bg-rose-500 hover:text-white rounded-xl transition-all shadow-sm group"
+                    >
+                        <Trash2 className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                        Cleanup Abandoned Checkouts
+                    </button>
                 </div>
-                <div className="flex bg-white border border-gray-100 p-1 rounded-lg">
-                    {['ALL', 'PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED'].map((tab) => (
+                <div className="flex bg-white border border-gray-100 p-1 rounded-lg overflow-x-auto whitespace-nowrap">
+                    {['ALL', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'PENDING', 'CANCELLED'].map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
@@ -130,7 +158,7 @@ export default function AdminOrdersPage() {
                                 : 'text-gray-400 hover:text-text-main-light'
                                 }`}
                         >
-                            {tab}
+                            {tab === 'PENDING' ? 'INCOMPLETE' : tab}
                         </button>
                     ))}
                 </div>
@@ -340,11 +368,10 @@ export default function AdminOrdersPage() {
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2">
                                                 <p className="text-[12px] text-gray-600 font-black uppercase tracking-widest">{selectedOrder.payment.provider}</p>
-                                                <span className={`text-[9px] font-bold px-2 py-0.5 rounded border uppercase tracking-widest ${
-                                                    selectedOrder.payment.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                                    selectedOrder.payment.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100' :
-                                                    'bg-rose-50 text-rose-600 border-rose-100'
-                                                }`}>{selectedOrder.payment.status}</span>
+                                                <span className={`text-[9px] font-bold px-2 py-0.5 rounded border uppercase tracking-widest ${selectedOrder.payment.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                                        selectedOrder.payment.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                                                            'bg-rose-50 text-rose-600 border-rose-100'
+                                                    }`}>{selectedOrder.payment.status}</span>
                                             </div>
                                             <p className="text-[11px] text-gray-500 font-medium">Amount: <span className="font-black text-text-main-light">R {Number(selectedOrder.payment.amount).toLocaleString()} {selectedOrder.payment.currency}</span></p>
                                             {selectedOrder.payment.pfPaymentId && (

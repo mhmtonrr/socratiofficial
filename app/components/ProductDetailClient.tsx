@@ -40,6 +40,20 @@ export default function ProductDetailClient({ product, similarProducts = [] }: P
     const defaultImage = images.find((img: any) => img.isMain)?.url || images[0]?.url;
     const [mainImage, setMainImage] = useState(defaultImage);
 
+    // Get stock for a specific size in the currently selected color
+    const getVariantStock = (size: string) => {
+        const v = variants.find((v: any) => v.color === selectedColor && v.size === size);
+        return v ? v.stock : 0;
+    };
+
+    // Find first available size when color changes
+    useEffect(() => {
+        const availableSize = uniqueSizes.find(size => getVariantStock(size) > 0);
+        if (availableSize) {
+            setSelectedSize(availableSize);
+        }
+    }, [selectedColor]);
+
     const handleNextImage = () => {
         const currentIndex = images.findIndex((img: any) => img.url === mainImage);
         const nextIndex = (currentIndex + 1) % images.length;
@@ -255,18 +269,32 @@ export default function ProductDetailClient({ product, similarProducts = [] }: P
                                             </button>
                                         </div>
                                         <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                                            {uniqueSizes.map((size: any) => (
-                                                <button
-                                                    key={size}
-                                                    onClick={() => setSelectedSize(size)}
-                                                    className={`py-3 text-[11px] border transition-all duration-300 ${selectedSize === size
-                                                        ? 'border-primary bg-primary text-white font-bold'
-                                                        : 'border-gray-200 text-gray-600 hover:border-primary hover:text-primary'
-                                                        }`}
-                                                >
-                                                    {size}
-                                                </button>
-                                            ))}
+                                            {uniqueSizes.map((size: any) => {
+                                                const stock = getVariantStock(size);
+                                                const isOutOfStock = stock <= 0;
+                                                const isLowStock = stock > 0 && stock <= 5;
+
+                                                return (
+                                                    <button
+                                                        key={size}
+                                                        disabled={isOutOfStock}
+                                                        onClick={() => setSelectedSize(size)}
+                                                        className={`relative py-3 text-[11px] border transition-all duration-300 flex flex-col items-center justify-center ${selectedSize === size
+                                                            ? 'border-primary bg-primary text-white font-bold'
+                                                            : isOutOfStock
+                                                                ? 'border-gray-100 text-gray-300 bg-gray-50 cursor-not-allowed'
+                                                                : 'border-gray-200 text-gray-600 hover:border-primary hover:text-primary'
+                                                            }`}
+                                                    >
+                                                        <span className={isOutOfStock ? 'line-through' : ''}>{size}</span>
+                                                        {isLowStock && (
+                                                            <span className={`text-[7px] mt-0.5 uppercase tracking-tighter ${selectedSize === size ? 'text-white/80' : 'text-amber-500'}`}>
+                                                                LAST {stock}
+                                                            </span>
+                                                        )}
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 )}
@@ -284,7 +312,23 @@ export default function ProductDetailClient({ product, similarProducts = [] }: P
                                             className="w-10 h-full hover:bg-gray-50 transition-colors"
                                         >+</button>
                                     </div>
-                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest">In Stock</p>
+                                    <div>
+                                        {(() => {
+                                            const currentStock = selectedSize ? getVariantStock(selectedSize) : 0;
+                                            if (currentStock <= 0) {
+                                                return <p className="text-[10px] text-red-500 uppercase tracking-widest font-bold">Sold Out</p>;
+                                            }
+                                            if (currentStock <= 5) {
+                                                return (
+                                                    <div className="flex flex-col">
+                                                        <p className="text-[10px] text-amber-600 uppercase tracking-widest font-bold animate-pulse">Low Stock: Only {currentStock} left</p>
+                                                        <p className="text-[8px] text-gray-400 uppercase tracking-widest">Order before it's gone</p>
+                                                    </div>
+                                                );
+                                            }
+                                            return <p className="text-[10px] text-emerald-600 uppercase tracking-widest font-bold">In Stock</p>;
+                                        })()}
+                                    </div>
                                 </div>
                             </div>
 
@@ -356,7 +400,7 @@ export default function ProductDetailClient({ product, similarProducts = [] }: P
                             <h2 className="text-3xl font-serif text-text-main-light mb-12 text-center uppercase tracking-widest">You Might Also Like</h2>
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
                                 {similarProducts.map((p: any) => (
-                                    <Link key={p.id} href={`/product/${p.id}`} className="group">
+                                    <Link key={p.id} href={`/product/${p.slug || p.name}`} className="group">
                                         <div className="aspect-square bg-transparent overflow-hidden relative mb-4">
                                             {p.images?.[0] && (
                                                 <Image

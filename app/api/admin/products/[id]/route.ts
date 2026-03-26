@@ -20,13 +20,29 @@ export async function DELETE(
             return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
         }
 
+        const decodedId = decodeURIComponent(id);
+        const product = await prisma.product.findFirst({
+            where: {
+                OR: [{ id }, { slug: id }, { name: decodedId }]
+            }
+        });
+
+        if (!product) {
+            return NextResponse.json({ error: "Product not found" }, { status: 404 });
+        }
+
+        const realId = product.id;
+
         // Relationları temizle (Veya Cascade delete varsa schema'da gerekmez ama prisma genelde manuel ister)
-        await prisma.productImage.deleteMany({ where: { productId: id } });
-        await prisma.productVariant.deleteMany({ where: { productId: id } });
+        await prisma.productImage.deleteMany({ where: { productId: realId } });
+        await prisma.productVariant.deleteMany({ where: { productId: realId } });
+        await prisma.review.deleteMany({ where: { productId: realId } });
 
         await prisma.product.delete({
-            where: { id }
+            where: { id: realId }
         });
+
+        // Done
 
         return NextResponse.json({ message: "Product deleted successfully" });
     } catch (error) {
@@ -50,12 +66,26 @@ export async function PATCH(
         if (!id) {
             return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
         }
+
+        const decodedId = decodeURIComponent(id);
+        const existingProduct = await prisma.product.findFirst({
+            where: {
+                OR: [{ id }, { slug: id }, { name: decodedId }]
+            }
+        });
+
+        if (!existingProduct) {
+            return NextResponse.json({ error: "Product not found" }, { status: 404 });
+        }
+
+        const realId = existingProduct.id;
+
         const body = await req.json();
-        const { name, slug, description, basePrice, categoryId, images, variants, details, care } = body;
+        const { name, slug, description, basePrice, categoryId, images, variants, details, care, salePrice, saleStartDate, saleEndDate, tags } = body;
 
         // Update product
-        const product = await prisma.product.update({
-            where: { id },
+        const productInfo = await prisma.product.update({
+            where: { id: realId },
             data: {
                 name,
                 slug,
@@ -64,24 +94,28 @@ export async function PATCH(
                 categoryId,
                 details,
                 care,
+                salePrice,
+                saleStartDate,
+                saleEndDate,
+                tags: tags || [],
             }
         });
 
         // Handle images update (Simple way: delete and recreate)
         if (images) {
-            await prisma.productImage.deleteMany({ where: { productId: id } });
+            await prisma.productImage.deleteMany({ where: { productId: realId } });
             await prisma.productImage.createMany({
                 data: images.map((img: any) => ({
                     url: img.url,
                     isMain: img.isMain || false,
-                    productId: id
+                    productId: realId
                 }))
             });
         }
 
         // Handle variants update
         if (variants) {
-            await prisma.productVariant.deleteMany({ where: { productId: id } });
+            await prisma.productVariant.deleteMany({ where: { productId: realId } });
             await prisma.productVariant.createMany({
                 data: variants.map((v: any) => ({
                     sku: v.sku || `${slug}-${v.color}-${v.size}-${Math.random().toString(36).substring(2, 7)}`.toLowerCase().replace(/\s+/g, '-'),
@@ -90,7 +124,7 @@ export async function PATCH(
                     colorHex: v.colorHex,
                     stock: v.stock || 0,
                     price: v.price || basePrice,
-                    productId: id
+                    productId: realId
                 }))
             });
         }

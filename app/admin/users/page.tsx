@@ -15,8 +15,12 @@ import {
     ShieldCheck,
     ShieldAlert,
     ChevronRight,
-    Filter
+    Filter,
+    Ban,
+    UserCheck,
+    Eye
 } from 'lucide-react';
+import Link from 'next/link';
 
 type User = {
     id: string;
@@ -24,6 +28,7 @@ type User = {
     firstName: string | null;
     lastName: string | null;
     role: 'USER' | 'ADMIN';
+    isSuspended: boolean;
     createdAt: string;
     _count: {
         orders: number;
@@ -65,6 +70,35 @@ export default function AdminUsersPage() {
             if (res.ok) fetchUsers();
         } catch (error) {
             console.error('Error updating role:', error);
+        }
+    };
+
+    const toggleSuspend = async (user: User) => {
+        const action = user.isSuspended ? 'unsuspend' : 'suspend';
+        if (!confirm(`Are you sure you want to ${action} ${user.email}?`)) return;
+
+        try {
+            const res = await fetch('/api/admin/users', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: user.id, isSuspended: !user.isSuspended }),
+            });
+            if (res.ok) fetchUsers();
+        } catch (error) {
+            console.error('Error updating suspension:', error);
+        }
+    };
+
+    const deleteUser = async (user: User) => {
+        if (!confirm(`Are you sure you want to PERMANENTLY delete ${user.email}? This action cannot be undone.`)) return;
+
+        try {
+            const res = await fetch(`/api/admin/users?id=${user.id}`, {
+                method: 'DELETE',
+            });
+            if (res.ok) fetchUsers();
+        } catch (error) {
+            console.error('Error deleting user:', error);
         }
     };
 
@@ -200,12 +234,12 @@ export default function AdminUsersPage() {
                                             </div>
                                         </td>
                                         <td className="px-10 py-8">
-                                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest ${user.role === 'ADMIN'
+                                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest leading-none ${user.isSuspended ? 'bg-rose-50 text-rose-500 border-rose-100' : user.role === 'ADMIN'
                                                 ? 'bg-primary/5 text-primary border-primary/10 shadow-[0_4px_12px_rgba(var(--primary-rgb),0.1)]'
                                                 : 'bg-gray-50 text-gray-400 border-gray-100'
                                                 }`}>
-                                                {user.role === 'ADMIN' ? <ShieldCheck className="w-3 h-3" /> : <Shield className="w-3 h-3" />}
-                                                {user.role === 'ADMIN' ? 'Atelier Curator' : 'Elite Member'}
+                                                {user.isSuspended ? <Ban className="w-3 h-3" /> : user.role === 'ADMIN' ? <ShieldCheck className="w-3 h-3" /> : <Shield className="w-3 h-3" />}
+                                                {user.isSuspended ? 'Suspended' : user.role === 'ADMIN' ? 'Atelier Curator' : 'Elite Member'}
                                             </div>
                                         </td>
                                         <td className="px-10 py-8">
@@ -220,10 +254,16 @@ export default function AdminUsersPage() {
                                         </td>
                                         <td className="px-10 py-8 text-right">
                                             <div className="flex justify-end gap-2 opacity-0 lg:group-hover:opacity-100 transition-all transform translate-x-2 lg:group-hover:translate-x-0">
-                                                <button onClick={() => toggleRole(user)} className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all">
+                                                <Link href={`/admin/users/${user.id}`} className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-emerald-500 hover:border-emerald-200 hover:shadow-lg transition-all" title="View Profile">
+                                                    <Eye className="w-4 h-4" />
+                                                </Link>
+                                                <button onClick={() => toggleSuspend(user)} className={`p-3 bg-white border border-gray-100 rounded-xl transition-all hover:shadow-lg ${user.isSuspended ? 'text-green-500 hover:border-green-200' : 'text-amber-500 hover:border-amber-200'}`} title={user.isSuspended ? 'Unsuspend' : 'Suspend Account'}>
+                                                    {user.isSuspended ? <UserCheck className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
+                                                </button>
+                                                <button onClick={() => toggleRole(user)} className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all" title="Toggle Role">
                                                     {user.role === 'ADMIN' ? <ShieldAlert className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
                                                 </button>
-                                                <button className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-rose-500 hover:border-rose-100 hover:shadow-lg transition-all">
+                                                <button onClick={() => deleteUser(user)} className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-rose-500 hover:border-rose-100 hover:shadow-lg transition-all" title="Delete User">
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             </div>
@@ -261,8 +301,8 @@ export default function AdminUsersPage() {
                                             <div className="flex items-center gap-2 text-[11px] text-gray-400 truncate mb-3">
                                                 <Mail className="w-3.5 h-3.5" /> {user.email}
                                             </div>
-                                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-[8px] font-black uppercase tracking-widest ${user.role === 'ADMIN' ? 'bg-primary/5 text-primary border-primary/10' : 'bg-gray-50 text-gray-400 border-gray-100'}`}>
-                                                {user.role === 'ADMIN' ? 'Curator' : 'Member'}
+                                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-[8px] font-black uppercase tracking-widest ${user.isSuspended ? 'bg-rose-50 text-rose-500 border-rose-100' : user.role === 'ADMIN' ? 'bg-primary/5 text-primary border-primary/10' : 'bg-gray-50 text-gray-400 border-gray-100'}`}>
+                                                {user.isSuspended ? 'Suspended' : user.role === 'ADMIN' ? 'Curator' : 'Member'}
                                             </div>
                                         </div>
                                     </div>
@@ -273,10 +313,16 @@ export default function AdminUsersPage() {
                                             <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest">Atelier Contribution</span>
                                         </div>
                                         <div className="flex gap-2">
+                                            <Link href={`/admin/users/${user.id}`} className="w-10 h-10 bg-white border border-gray-100 rounded-xl text-emerald-400 flex items-center justify-center hover:text-emerald-500 transition-all shadow-sm">
+                                                <Eye className="w-3.5 h-3.5" />
+                                            </Link>
+                                            <button onClick={() => toggleSuspend(user)} className={`w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center transition-all shadow-sm ${user.isSuspended ? 'text-green-500' : 'text-amber-500'}`}>
+                                                {user.isSuspended ? <UserCheck className="w-3.5 h-3.5" /> : <Ban className="w-3.5 h-3.5" />}
+                                            </button>
                                             <button onClick={() => toggleRole(user)} className="w-10 h-10 bg-white border border-gray-100 rounded-xl text-gray-400 flex items-center justify-center hover:text-primary transition-all shadow-sm">
                                                 {user.role === 'ADMIN' ? <ShieldAlert className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
                                             </button>
-                                            <button className="w-10 h-10 bg-white border border-gray-100 rounded-xl text-rose-400 flex items-center justify-center transition-all shadow-sm">
+                                            <button onClick={() => deleteUser(user)} className="w-10 h-10 bg-white border border-gray-100 rounded-xl text-rose-400 flex items-center justify-center transition-all shadow-sm">
                                                 <Trash2 className="w-3.5 h-3.5" />
                                             </button>
                                         </div>

@@ -18,6 +18,7 @@ export async function GET() {
                 firstName: true,
                 lastName: true,
                 role: true,
+                isSuspended: true,
                 createdAt: true,
                 _count: {
                     select: { orders: true }
@@ -39,14 +40,41 @@ export async function PATCH(req: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { id, role } = await req.json();
+        const body = await req.json();
+        
+        const dataToUpdate: any = {};
+        if (body.role !== undefined) dataToUpdate.role = body.role;
+        if (body.isSuspended !== undefined) dataToUpdate.isSuspended = body.isSuspended;
 
         const updatedUser = await prisma.user.update({
-            where: { id },
-            data: { role }
+            where: { id: body.id },
+            data: dataToUpdate
         });
 
         return NextResponse.json(updatedUser);
+    } catch (error) {
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+}
+export async function DELETE(req: Request) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session || (session.user as any).role !== "ADMIN") {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const url = new URL(req.url);
+        const id = url.searchParams.get('id');
+
+        if (!id) {
+            return NextResponse.json({ error: "Missing user ID" }, { status: 400 });
+        }
+
+        await prisma.user.delete({
+            where: { id }
+        });
+
+        return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }

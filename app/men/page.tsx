@@ -48,6 +48,7 @@ export default async function MenPage({ searchParams }: PageProps) {
 
     // 2. Build the where clause
     let finalWhere: any = {
+        isActive: true,
         AND: [
             {
                 OR: [
@@ -219,7 +220,7 @@ export default async function MenPage({ searchParams }: PageProps) {
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
                             {products.map((product) => (
-                                <Link key={product.id} href={`/product/${product.id}`} className="group drop-shadow-sm hover:drop-shadow-md transition-all">
+                                <Link key={product.id} href={`/product/${product.slug}`} className="group drop-shadow-sm hover:drop-shadow-md transition-all">
                                     <div className="relative overflow-hidden bg-[#F0F0F0] aspect-square mb-6 shadow-inner">
                                         {product.images[0] && (
                                             <Image

@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Bell, ChevronDown, UserCircle, Menu, X, CreditCard } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Bell, ChevronDown, UserCircle, Menu, X, CreditCard, Tag, LineChart, Image as ImageIcon, MessageSquare, ClipboardList } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
@@ -40,9 +40,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const navItems = [
         { label: 'Executive Overview', icon: LayoutDashboard, href: '/admin' },
         { label: 'Master Catalogue', icon: Package, href: '/admin/products' },
+        { label: 'Inventory Control', icon: ClipboardList, href: '/admin/inventory' },
         { label: 'Client Orders', icon: ShoppingBag, href: '/admin/orders' },
         { label: 'Payments', icon: CreditCard, href: '/admin/payments' },
         { label: 'Artisanal Users', icon: Users, href: '/admin/users' },
+        { label: 'Client Reviews', icon: MessageSquare, href: '/admin/reviews' },
+        { label: 'Coupons & Perks', icon: Tag, href: '/admin/coupons' },
+        { label: 'Reports & Analytics', icon: LineChart, href: '/admin/reports' },
+        { label: 'Media Library', icon: ImageIcon, href: '/admin/media' },
+        { label: 'Email Monitoring', icon: Bell, href: '/admin/emails' },
     ];
 
     return (

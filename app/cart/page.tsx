@@ -4,14 +4,47 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 import { X, Plus, Minus, ShoppingBag, ArrowRight, Truck, ShieldCheck, RefreshCcw } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 
 export default function CartPage() {
-    const { cartItems, removeItem, updateQuantity, cartTotal, cartCount } = useCart();
+    const { cartItems, removeItem, updateQuantity, cartTotal, cartCount, couponCode, discountAmount, applyCoupon, removeCoupon } = useCart();
+    
+    // Coupon state local
+    const [couponInput, setCouponInput] = useState('');
+    const [couponError, setCouponError] = useState('');
+    const [isApplying, setIsApplying] = useState(false);
 
     const shipping = cartTotal > 5000 ? 0 : 250; // Free shipping over R 5,000
-    const total = cartTotal + shipping;
+    // Prevent negative total if discount is somehow larger
+    const total = Math.max(0, cartTotal - discountAmount) + shipping;
+
+    const handleApplyCoupon = async () => {
+        if (!couponInput.trim()) return;
+        setCouponError('');
+        setIsApplying(true);
+
+        try {
+            const res = await fetch('/api/cart/apply-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: couponInput.trim(), cartTotal }),
+            });
+            const data = await res.json();
+            
+            if (!res.ok) {
+                setCouponError(data.error || 'Invalid coupon codes');
+            } else {
+                applyCoupon(data.coupon.code, data.discountAmount);
+                setCouponInput('');
+            }
+        } catch (error) {
+            setCouponError('An unexpected error occurred');
+        } finally {
+            setIsApplying(false);
+        }
+    };
 
     return (
         <div className="flex flex-col min-h-screen bg-[#FBFAF9]">
@@ -63,7 +96,7 @@ export default function CartPage() {
                                     <div key={item.id} className="grid grid-cols-1 md:grid-cols-12 gap-6 pb-8 border-b border-gray-50 group">
                                         <div className="md:col-span-6 flex gap-6">
                                             <div className="relative w-24 h-30 md:w-32 md:h-40 flex-shrink-0 bg-[#F9F9F9] overflow-hidden shadow-sm">
-                                                <Link href={`/product/${item.productId}`}>
+                                                <Link href={`/product/${item.name}`}>
                                                     <Image
                                                         alt={item.name}
                                                         className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -74,7 +107,7 @@ export default function CartPage() {
                                             </div>
                                             <div className="flex flex-col justify-between py-1">
                                                 <div>
-                                                    <Link href={`/product/${item.productId}`} className="hover:text-primary transition-colors inline-block">
+                                                    <Link href={`/product/${item.name}`} className="hover:text-primary transition-colors inline-block">
                                                         <h3 className="text-lg font-serif text-text-main-light mb-2">{item.name}</h3>
                                                     </Link>
                                                     <div className="space-y-1">
@@ -153,6 +186,17 @@ export default function CartPage() {
                                             <span>Subtotal</span>
                                             <span className="text-text-main-light font-bold">R {cartTotal.toLocaleString()}</span>
                                         </div>
+                                        {couponCode && (
+                                            <div className="flex justify-between text-xs uppercase tracking-widest text-emerald-600">
+                                                <span className="flex items-center gap-2">
+                                                    Discount ({couponCode})
+                                                    <button onClick={removeCoupon} className="text-rose-500 hover:text-rose-700 ml-1" title="Remove coupon">
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </span>
+                                                <span className="font-bold">-R {discountAmount.toLocaleString()}</span>
+                                            </div>
+                                        )}
                                         <div className="flex justify-between text-xs uppercase tracking-widest text-gray-500">
                                             <span>Shipping</span>
                                             <span className="text-text-main-light font-bold">
@@ -168,8 +212,31 @@ export default function CartPage() {
                                                 <span className="text-lg font-serif text-text-main-light">Order Total</span>
                                                 <span className="text-3xl font-serif text-text-main-light">R {total.toLocaleString()}</span>
                                             </div>
-                                            <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-8">Currency: ZAR (R)</p>
+                                            <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-4">Currency: ZAR (R)</p>
                                         </div>
+                                        
+                                        {/* Coupon Input */}
+                                        {!couponCode && (
+                                            <div className="pt-6 border-t border-gray-100 flex items-start gap-2">
+                                                <div className="flex-grow">
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Voucher/Promo Code" 
+                                                        value={couponInput}
+                                                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                                                        className="w-full border border-gray-300 px-3 py-3 text-xs uppercase tracking-widest focus:outline-none focus:border-text-main-light"
+                                                    />
+                                                    {couponError && <p className="text-rose-500 text-[10px] mt-1 uppercase tracking-widest italic">{couponError}</p>}
+                                                </div>
+                                                <button 
+                                                    onClick={handleApplyCoupon}
+                                                    disabled={isApplying || !couponInput.trim()}
+                                                    className="bg-gray-100 text-text-main-light px-4 py-3 text-xs uppercase tracking-widest font-bold hover:bg-gray-200 transition-colors disabled:opacity-50"
+                                                >
+                                                    {isApplying ? '...' : 'Apply'}
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <Link

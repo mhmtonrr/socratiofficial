@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     try {
         const session = await getServerSession(authOptions);
         const body = await request.json();
-        const { contact, cartItems, shippingMethod } = body;
+        const { contact, cartItems, shippingMethod, couponCode } = body;
 
         // ── 1. Validate input ────────────────────────────────────────────────
         if (!contact?.email || !contact?.firstName || !contact?.lastName || !contact?.address || !contact?.city || !contact?.zip) {
@@ -74,13 +74,38 @@ export async function POST(request: Request) {
             });
         }
 
-        // ── 3. Calculate shipping ────────────────────────────────────────────
+        // ── 3. Calculate shipping & Discounts ────────────────────────────────────────────
         const standardShippingFee = calculatedSubtotal > 5000 ? 0 : 250;
         const shippingCost =
             shippingMethod === 'express' ? 450
             : shippingMethod === 'overnight' ? 650
             : standardShippingFee;
-        const finalTotal = calculatedSubtotal + shippingCost;
+
+        let discountValue = 0;
+        let validCouponId = null;
+
+        if (couponCode) {
+            const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
+            if (coupon && coupon.isActive) {
+                // simple validation
+                const now = new Date();
+                const isValidDate = (!coupon.startDate || coupon.startDate <= now) && (!coupon.endDate || coupon.endDate >= now);
+                const isUnderLimit = !coupon.maxUses || coupon.currentUses < coupon.maxUses;
+                const meetsMinOrder = !coupon.minOrderValue || calculatedSubtotal >= Number(coupon.minOrderValue);
+
+                if (isValidDate && isUnderLimit && meetsMinOrder) {
+                    validCouponId = coupon.id;
+                    if (coupon.type === 'PERCENTAGE') {
+                        discountValue = (calculatedSubtotal * Number(coupon.value)) / 100;
+                    } else {
+                        discountValue = Number(coupon.value);
+                    }
+                    if (discountValue > calculatedSubtotal) discountValue = calculatedSubtotal;
+                }
+            }
+        }
+
+        const finalTotal = Math.max(0, calculatedSubtotal - discountValue) + shippingCost;
 
         // ── 4. Resolve userId (session or create account for guest) ──────────
         const { createAccount, password, saveAddress } = body;
@@ -157,6 +182,8 @@ export async function POST(request: Request) {
                     status: 'PENDING',
                     totalAmount: finalTotal,
                     shippingCost,
+                    discountAmount: discountValue,
+                    couponId: validCouponId,
                     shippingAddress: contact,
                     billingAddress: contact,
                     items: { create: orderItemsData },

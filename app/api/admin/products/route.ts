@@ -34,7 +34,7 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-        const { name, slug, description, basePrice, categoryId, images, variants, details, care } = body;
+        const { name, slug, description, basePrice, categoryId, images, variants, details, care, salePrice, saleStartDate, saleEndDate, tags } = body;
 
         const product = await prisma.product.create({
             data: {
@@ -45,6 +45,10 @@ export async function POST(req: Request) {
                 categoryId,
                 details,
                 care,
+                salePrice,
+                saleStartDate,
+                saleEndDate,
+                tags: tags || [],
                 images: {
                     create: images.map((img: any) => ({
                         url: img.url,

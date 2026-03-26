@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { v2 as cloudinary } from 'cloudinary';
+import { prisma } from '@/lib/prisma';
 
 // Cloudinary configuration is automatically handled by CLOUDINARY_URL env variable
 // but we can ensure it's initialized if needed.
@@ -50,8 +51,18 @@ export async function POST(request: Request) {
 
         const result = uploadResponse as any;
 
+        // Save entry to Media table
+        await prisma.media.create({
+            data: {
+                url: result.secure_url,
+                publicId: result.public_id,
+                format: result.format,
+                bytes: result.bytes,
+            }
+        });
+
         // Return the Cloudinary secure URL
-        return NextResponse.json({ url: result.secure_url });
+        return NextResponse.json({ url: result.secure_url, publicId: result.public_id, mediaId: result.public_id });
     } catch (error) {
         console.error('Upload Error:', error);
         return NextResponse.json({ error: 'Upload failed' }, { status: 500 });

@@ -147,7 +147,7 @@ export default function ProductSlider({ products }: ProductSliderProps) {
                     {displayProducts.map((product, idx) => (
                         <Link
                             key={`${product.id}-${idx}`}
-                            href={`/product/${product.id}`}
+                            href={`/product/${product.slug || product.name}`}
                             onClick={handleLinkClick}
                             onDragStart={(e) => e.preventDefault()}
                             onMouseEnter={() => setIsHovered(true)}

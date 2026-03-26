@@ -7,6 +7,7 @@ import ProductSlider from './components/ProductSlider';
 
 export default async function Home() {
     const rawProducts = await prisma.product.findMany({
+        where: { isActive: true },
         take: 20,
         orderBy: { createdAt: 'desc' },
         include: {
@@ -56,7 +57,7 @@ export default async function Home() {
                                     className="object-cover object-bottom transition-transform duration-700 group-hover:scale-105"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-12">
-                                    <h4 className="text-white text-3xl font-serif italic mb-2">Evening Elegance</h4>
+                                    <h4 className="text-white text-3xl font-serif italic mb-2">The Femme Collection</h4>
                                     <span className="text-white/80 text-xs uppercase tracking-widest">Discover Collection &rarr;</span>
                                 </div>
                             </Link>

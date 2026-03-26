@@ -1,0 +1,98 @@
+Executive Summary
+The Socrati ecommerce platform has a solid foundation: customers can browse products, add to cart, checkout, and pay. Admins can manage products and view orders. However, several modules that are standard on any ecommerce platform are either incomplete or do not exist yet. This brief outlines those gaps.
+
+What Is Already Working ✅
+- Customers can browse, search, and filter products
+- Product pages with size/colour variants, images, and pricing
+- Shopping cart and guest/logged-in checkout
+- Payment processing (PayFast + Peach Payments)
+- Order tracking with statuses (Pending → Shipped → Delivered)
+- Admin can add, edit, and delete products with images and stock
+- Admin can view orders and payments
+- Basic user accounts (register, login, addresses)
+Module Status Overview
+
+Product Management	🟡 Mostly there	
+- Core works; a few features missing
+Inventory Management ✅ Built	
+- Full monitoring, logs, and low-stock alerts active.
+User Management ✅ Built	
+- Admin roles, suspension, and account controls functional.
+Email Notifications ✅ Built	
+- Automated status updates, inventory alerts, and audit log.
+Coupon / Discount System 🔴 Not built	
+- No discount functionality exists
+Media Management 🟡 Partially built	
+- Images upload but can't be managed
+Reporting & Analytics	🔴 Not built	
+- Only static all-time totals; no real insights
+
+What Needs to Be Built
+✅ 📧 Email Notifications — Built
+- Order confirmation emails (Customer & Admin)
+- Shipping / Status update notifications
+- Welcome and Account-related emails
+- Low-stock alerts for inventory management
+- Admin Email Monitoring Log for auditing all communications
+🏷️ Coupon & Discount System — Not Built
+Business impact: There is no way to run promotions, offer discounts, or reward loyal customers. This is a standard feature on every ecommerce platform.
+What's needed:
+- Ability to create discount codes (percentage off, fixed amount off)
+- Set rules: minimum order value, expiry date, maximum number of uses
+- Customers can enter a coupon code at checkout
+- Admin dashboard to manage and track all coupons
+- Usage reporting (how many times each code was used, revenue impact)
+-
+📈 Reporting & Analytics — Not Built
+Business impact: The current dashboard shows only all-time totals with no ability to filter by date. Business decisions cannot be made from this data. Growth figures shown are fake placeholders.
+What's needed:
+- Daily, weekly, monthly and custom date range reporting
+- Revenue over time (chart)
+- Number of orders over time (chart)
+- Top-selling products
+- Best customers by spend
+- Average order value
+- Sales by product category
+- Ability to export any report to a spreadsheet
+✅ 🖼️ Media Management — Built
+Business impact: Admins can upload product images but cannot browse, organise, or delete them. Every upload creates a new file even if the same image already exists.
+What's needed:
+- A central media library where all uploaded images are visible
+- Ability to delete images no longer in use
+- Ability to reuse an existing image on multiple products without re-uploading
+- Drag-and-drop ordering of product gallery images
+✅ 👤 User Management — Built
+Business impact: Admins can see users and toggle them between customer and admin. However, several standard features a customer expects are missing.
+What's needed:
+- Forgot password / reset password flow (currently impossible to recover an account)
+- Email verification on registration
+- Ability for admin to suspend an account without deleting it
+- Admin view of a specific customer's full profile, order history, and total spend
+- Delete user button (exists on screen but does not work)
+✅ 📦 Product Management — Built
+Business impact: Minor gaps that limit admin efficiency and marketing flexibility.
+What's needed:
+- Sale pricing (ability to set a sale price and schedule sale dates)
+- Product tags for better filtering and promotions
+- Bulk actions (select multiple products and delete/update) — currently broken
+- Activate / deactivate a product without deleting it
+- Ability to moderate and respond to customer reviews
+- Duplicate a product quickly
+✅ 🗄️ Inventory Management — Built
+Business impact: Stock levels are visible but there are no proper management tools, no alerts, and no history.
+What's needed:
+- A dedicated inventory screen listing all products and stock levels in one place
+- Ability to edit stock quantities directly from the inventory screen (without going into each product)
+- Automatic stock reduction when an order is placed (needs verification that this is working)
+- Configurable low-stock warning threshold per product
+- Stock change history so admins can see when and why stock changed
+- Bulk stock update via spreadsheet import
+Recommended Priority Order
+#	Module	Why
+1	Email Notifications	Customers get zero feedback after purchase — this is urgent!
+2	Coupon System	Blocks any promotional activity
+3	Inventory Fixes	Verify stock deduction is working; add management screen
+4	Reporting	Required for business decision-making
+5	User Management	Password reset is a basic customer expectation
+6	Media Library	Improves admin efficiency
+7	Product Gaps	Sale prices and bulk actions improve merchandising

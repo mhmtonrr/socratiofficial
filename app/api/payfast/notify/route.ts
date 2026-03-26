@@ -24,6 +24,8 @@ import {
     confirmWithPayfast,
     buildITNParamString,
 } from '@/lib/payfast';
+import { sendEmail, checkAndNotifyLowStock } from '@/lib/emails';
+import { buildOrderConfirmationEmail, buildAdminNewOrderEmail } from '@/lib/email-templates';
 
 export async function POST(request: NextRequest) {
     try {
@@ -64,7 +66,7 @@ export async function POST(request: NextRequest) {
 
         const order = await prisma.order.findFirst({
             where: orderId ? { id: orderId } : { orderNumber },
-            include: { items: true, payment: true },
+            include: { items: true, payment: true, user: true },
         });
 
         if (!order) {
@@ -115,11 +117,60 @@ export async function POST(request: NextRequest) {
                             where: { id: item.variantId },
                             data: { stock: { decrement: item.quantity } },
                         });
+                        await tx.stockHistory.create({
+                            data: {
+                                variantId: item.variantId,
+                                change: -item.quantity,
+                                reason: `Order Placed: ${order.orderNumber}`
+                            }
+                        });
                     }
+                }
+
+                // Increment coupon usage if there is one
+                if ((order as any).couponId) {
+                    await tx.coupon.update({
+                        where: { id: (order as any).couponId },
+                        data: { currentUses: { increment: 1 } },
+                    });
                 }
             });
 
+            // ── 7b. Low stock check AFTER transaction ────────────────────────
+            for (const item of order.items) {
+                if (item.variantId) {
+                    await checkAndNotifyLowStock(item.variantId);
+                }
+            }
+
             console.log('[Payfast ITN] ✅ Order PAID:', order.orderNumber);
+
+            // ── Send Order Confirmation Email ─────────────────────────────────
+            const customerEmail = order.guestEmail || order.user?.email;
+            const customerName = order.user?.firstName || 'Customer';
+
+            if (customerEmail) {
+                const html = buildOrderConfirmationEmail(order as any, customerName);
+                await sendEmail({
+                    to: customerEmail,
+                    subject: `Order Confirmation - ${order.orderNumber}`,
+                    html,
+                });
+                console.log(`[Payfast ITN] 📧 Confirmation email sent to ${customerEmail}`);
+                
+                // ── Send Notification to Admin ────────────────────────────────────
+                const adminEmail = process.env.ADMIN_EMAIL;
+                if (adminEmail) {
+                    await sendEmail({
+                        to: adminEmail,
+                        subject: `New Order Received: ${order.orderNumber}`,
+                        html: buildAdminNewOrderEmail(order as any, customerName, customerEmail),
+                    });
+                    console.log(`[Payfast ITN] 🚨 Admin notification sent to ${adminEmail}`);
+                }
+            } else {
+                console.warn(`[Payfast ITN] ⚠️ No email found for order ${order.orderNumber}`);
+            }
 
         } else if (paymentStatus === 'CANCELLED') {
             await prisma.$transaction(async (tx: Prisma.TransactionClient) => {

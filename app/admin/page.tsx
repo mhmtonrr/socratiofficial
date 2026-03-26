@@ -196,7 +196,7 @@ export default function AdminDashboard() {
                                             <p className="text-xs font-bold text-text-main-light line-clamp-1">{variant.product.name}</p>
                                             <p className="text-[9px] text-gray-400 uppercase font-black">Size {variant.size} • {variant.stock} left</p>
                                         </div>
-                                        <Link href={`/admin/products/edit/${variant.productId}`} className="p-2 text-gray-300 hover:text-primary transition-colors">
+                                        <Link href={`/admin/products/edit/${variant.product.name}`} className="p-2 text-gray-300 hover:text-primary transition-colors">
                                             <ChevronRight className="w-4 h-4" />
                                         </Link>
                                     </div>

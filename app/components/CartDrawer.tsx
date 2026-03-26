@@ -168,12 +168,13 @@ export default function CartDrawer() {
                             Secure Checkout
                             <ArrowRight className="w-4 h-4" />
                         </Link>
-                        <button
+                        <Link
+                            href="/cart"
                             onClick={() => setIsCartOpen(false)}
-                            className="w-full border border-gray-200 text-text-main-light py-3.5 text-[10px] uppercase tracking-[0.2em] font-bold hover:border-primary hover:text-primary transition-all duration-300"
+                            className="block text-center w-full border border-gray-200 text-text-main-light py-3.5 text-[10px] uppercase tracking-[0.2em] font-bold hover:border-primary hover:text-primary transition-all duration-300"
                         >
-                            Continue Shopping
-                        </button>
+                            View Cart
+                        </Link>
                     </div>
                 )}
             </div>

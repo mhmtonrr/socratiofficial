@@ -46,8 +46,8 @@ export default async function WomenPage({ searchParams }: PageProps) {
         select: { size: true, color: true, colorHex: true }
     });
 
-    // 2. Build the where clause
     let finalWhere: any = {
+        isActive: true,
         AND: [
             {
                 OR: [
@@ -228,7 +228,7 @@ export default async function WomenPage({ searchParams }: PageProps) {
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
                             {products.map((product) => (
-                                <Link key={product.id} href={`/product/${product.id}`} className="group">
+                                <Link key={product.id} href={`/product/${product.slug}`} className="group">
                                     <div className="relative overflow-hidden bg-[#F8F8F8] aspect-square mb-6">
                                         {product.images[0] && (
                                             <Image

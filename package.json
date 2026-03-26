@@ -12,11 +12,16 @@
     "@next-auth/prisma-adapter": "^1.0.7",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.9.0",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
     "next-auth": "^4.24.13",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "react-hot-toast": "^2.6.0",
+    "recharts": "^3.8.0",
+    "resend": "^6.9.4",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@prisma/client": "^5.18.0",
@@ -31,8 +36,5 @@
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5"
-  },
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   }
 }

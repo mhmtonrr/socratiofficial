@@ -26,6 +26,7 @@ export async function GET(request: Request) {
             },
             select: {
                 id: true,
+                slug: true,
                 name: true,
                 basePrice: true,
                 images: {

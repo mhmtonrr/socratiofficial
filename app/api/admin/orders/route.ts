@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { sendEmail } from '@/lib/emails';
+import { buildOrderShippedEmail, buildOrderDeliveredEmail } from '@/lib/email-templates';
 
 // Get all orders
 export async function GET() {
@@ -66,7 +68,23 @@ export async function PATCH(request: Request) {
         const updatedOrder = await prisma.order.update({
             where: { id },
             data: { status },
+            include: { user: true }
         });
+
+        // Send Email Notifications
+        if (status === 'SHIPPED') {
+            await sendEmail({
+                to: updatedOrder.guestEmail || updatedOrder.user?.email || '',
+                subject: `Socrati - Your Order #${updatedOrder.orderNumber} has been shipped!`,
+                html: buildOrderShippedEmail(updatedOrder.orderNumber, null, null) // Tracking info can be added later if needed
+            });
+        } else if (status === 'DELIVERED') {
+            await sendEmail({
+                to: updatedOrder.guestEmail || updatedOrder.user?.email || '',
+                subject: `Socrati - Your Order #${updatedOrder.orderNumber} has been delivered!`,
+                html: buildOrderDeliveredEmail(updatedOrder.orderNumber)
+            });
+        }
 
         return NextResponse.json(updatedOrder);
     } catch (error) {
