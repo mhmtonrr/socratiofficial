@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
         // ── Send Verification Email ─────────────────────────────────
         try {
-            const verificationLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}`;
+            const verificationLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://socratiofficial.co.za'}/verify-email?token=${verificationToken}`;
             
             await sendEmail({
                 to: user.email,

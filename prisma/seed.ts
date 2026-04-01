@@ -10,19 +10,33 @@ const prisma = new PrismaClient()
 async function main() {
     console.log('Running safe seed (upsert mode — existing data will NOT be deleted)...')
 
-    // ── 0. Admin User (safe upsert) ─────────────────────────────────────────
-    const adminPassword = await bcrypt.hash('admin123', 12)
+    // ── 0. Admin User (securely from env) ──────────────────────────────────
+    const adminEmail = process.env.ADMIN_LOGIN_EMAIL || 'admin@socratiofficial.co.za'
+    const adminPass = process.env.ADMIN_LOGIN_PASSWORD || 'Socrati#Admin#2024!'
+
+    const hashedPassword = await bcrypt.hash(adminPass, 12)
+
     await prisma.user.upsert({
-        where: { email: 'admin@socrati.com' },
-        update: {},   // never overwrite if admin already exists
+        where: { email: adminEmail },
+        update: {
+            password: hashedPassword, // allow updating password via seed re-run if needed
+        },
         create: {
-            email: 'admin@socrati.com',
-            password: adminPassword,
+            email: adminEmail,
+            password: hashedPassword,
             firstName: 'Admin',
-            lastName: 'User',
+            lastName: 'System',
             role: 'ADMIN',
+            isVerified: true,
         },
     })
+
+    // Remove the old legacy admin if it exists
+    await prisma.user.deleteMany({
+        where: {
+            email: 'admin@socrati.com',
+        }
+    }).catch(() => {});
 
     // ── 1. Ürün ve Kategori Seeding İptal Edildi ─────────────────────────────
     // Ürünler ve görseller zaten Cloudinary / Admin Paneli aracılığıyla gerçek veritabanında yer aldığından,

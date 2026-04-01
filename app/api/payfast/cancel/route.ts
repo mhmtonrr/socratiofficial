@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
         }
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://socratiofficial.co.za';
     return NextResponse.redirect(
         `${appUrl}/payment/cancel${orderNumber ? `?orderNumber=${orderNumber}` : ''}`
     );

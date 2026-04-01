@@ -31,7 +31,7 @@ export async function POST(req: Request) {
         });
 
         // Send Email
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://socratiofficial.co.za';
         const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
 
         await sendEmail({

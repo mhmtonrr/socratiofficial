@@ -205,7 +205,7 @@ export async function POST(request: Request) {
         });
 
         // ── 6. Build Payfast form data with MD5 signature ────────────────────
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://socratiofficial.co.za';
 
         const payfastData = buildPayfastFormData({
             orderId: order.id,

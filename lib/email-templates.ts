@@ -240,7 +240,7 @@ export const buildOrderDeliveredEmail = (orderNumber: string) => {
         <p>We hope you love your new Socrati items. If there are any issues with your order, or you need to process a return, please visit our website within the next 14 days.</p>
 
         <p style="text-align: center; margin-top: 30px; margin-bottom: 30px;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; font-weight: bold; display: inline-block;">Shop Again</a>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://socratiofficial.co.za'}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; font-weight: bold; display: inline-block;">Shop Again</a>
         </p>
 
         <p style="margin-top: 40px; color: #6b7280; font-size: 14px;">
@@ -267,7 +267,7 @@ export const buildLowStockEmail = (productName: string, sku: string, stock: numb
       </div>
       
       <p style="margin-top: 20px; text-align: center;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/admin/inventory" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Manage Inventory</a>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://socratiofficial.co.za'}/admin/inventory" style="background-color: #000; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Manage Inventory</a>
       </p>
     </div>
   `;

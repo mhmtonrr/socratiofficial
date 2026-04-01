@@ -51,7 +51,7 @@ DATABASE_URL="postgresql://socrati:socrati_dev_password@localhost:5432/socratiof
 # NEXTAUTH
 # =============================================================================
 NEXTAUTH_SECRET="your-long-random-secret"      # openssl rand -base64 32
-NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_URL="https://socratiofficial.co.za"
 
 # =============================================================================
 # CLOUDINARY  (image uploads)
@@ -86,7 +86,7 @@ NEXT_PUBLIC_PEACH_ENTITY_ID="your-entity-id"   # safe to expose — used by the 
 # For payment webhooks (PayFast ITN, Peach notify) you need a public URL.
 # Locally: run `ngrok http 3000` and paste the https URL here.
 # =============================================================================
-NEXT_PUBLIC_APP_URL="http://localhost:3000"     # replace with ngrok URL for webhook testing
+NEXT_PUBLIC_APP_URL="https://socratiofficial.co.za"     # replace with ngrok URL for webhook testing
 
 # =============================================================================
 # GOOGLE MAPS  (address autocomplete on checkout)

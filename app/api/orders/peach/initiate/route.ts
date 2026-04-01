@@ -192,7 +192,7 @@ export async function POST(request: Request) {
         });
 
         // ── 6. Create Peach checkout instance ─────────────────────────────────
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://socratiofficial.co.za';
 
         const { checkoutId } = await createPeachCheckout({
             merchantTransactionId: order.orderNumber,

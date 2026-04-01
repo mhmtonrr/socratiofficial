@@ -52,7 +52,15 @@ function LoginContent() {
             });
 
             if (result?.error) {
-                setLoginErrors({ general: 'Invalid email or password' });
+                // Determine a more user-friendly error message
+                let errorMsg = 'Invalid email or password';
+                
+                // If NextAuth returns the specific text we throw in lib/auth.ts, use it
+                if (result.error !== 'CredentialsSignin') {
+                    errorMsg = result.error;
+                }
+                
+                setLoginErrors({ general: errorMsg });
             } else {
                 router.push(redirectTo);
                 router.refresh();
@@ -83,8 +91,12 @@ function LoginContent() {
         if (!regEmail.trim()) errors.email = 'Email address is required';
         else if (!emailRegex.test(regEmail)) errors.email = 'Please enter a valid email address';
 
-        if (!regPassword) errors.password = 'Password is required';
-        else if (regPassword.length < 8) errors.password = 'Password must be at least 8 characters';
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+        if (!regPassword) {
+            errors.password = 'Password is required';
+        } else if (!passwordRegex.test(regPassword)) {
+            errors.password = 'Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character (@$!%*?&#)';
+        }
 
         if (Object.keys(errors).length > 0) {
             setRegErrors(errors);
@@ -241,7 +253,7 @@ function LoginContent() {
                                         className={`w-full bg-transparent border ${regErrors.password ? 'border-rose-500' : 'border-gray-300'} px-4 py-4 text-sm focus:outline-none focus:border-primary focus:ring-0 rounded-none text-text-main-light placeholder-gray-400 transition-colors`}
                                         id="reg-password"
                                         type="password"
-                                        placeholder="Min. 8 chars w/ numbers & uppercase"
+                                        placeholder="Min. 8 chars, uppercase, lowercase, number & symbol"
                                         value={regPassword}
                                         onChange={(e) => setRegPassword(e.target.value)}
                                     />
