@@ -53,9 +53,8 @@ export async function POST(request: Request) {
                 return NextResponse.json({ error: `Insufficient stock for ${variant.product.name} (${variant.size})` }, { status: 400 });
             }
 
-            // Use DB price for specific variant if exists, else product base price
-            // Ensure we handle Decimal to number conversion for calculation
-            const unitPrice = variant.price ? Number(variant.price) : Number(variant.product.basePrice);
+            // Use basePrice to match what is shown in UI and Cart
+            const unitPrice = Number(variant.product.basePrice);
             const lineTotal = unitPrice * item.quantity;
             calculatedSubtotal += lineTotal;
 

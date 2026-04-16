@@ -48,7 +48,7 @@ export async function POST(request: Request) {
             const variant = dbVariants.find((v: any) => v.id === cartItem.variantId);
             if (!variant) return NextResponse.json({ error: `Product variant not found: ${cartItem.variantId}` }, { status: 400 });
 
-            const unitPrice = Number(variant.price || variant.product.basePrice);
+            const unitPrice = Number(variant.product.basePrice);
             const lineTotal = unitPrice * cartItem.quantity;
             calculatedSubtotal += lineTotal;
 

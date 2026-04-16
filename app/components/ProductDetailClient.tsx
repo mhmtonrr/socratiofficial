@@ -95,7 +95,7 @@ export default function ProductDetailClient({ product, similarProducts = [] }: P
             name: product.name,
             color: selectedColor!,
             size: selectedSize!,
-            price: Number(variant.price || product.basePrice),
+            price: Number(product.basePrice),
             quantity: quantity,
             image: mainImage || defaultImage
         });

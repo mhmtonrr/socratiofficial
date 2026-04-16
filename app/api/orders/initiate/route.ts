@@ -58,7 +58,7 @@ export async function POST(request: Request) {
                 );
             }
 
-            const unitPrice = variant.price ? Number(variant.price) : Number(variant.product.basePrice);
+            const unitPrice = Number(variant.product.basePrice);
             const lineTotal = unitPrice * item.quantity;
             calculatedSubtotal += lineTotal;
 
