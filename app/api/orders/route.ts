@@ -70,7 +70,7 @@ export async function POST(request: Request) {
             });
         }
 
-        const standardShippingFee = calculatedSubtotal > 500 ? 0 : 25;
+        const standardShippingFee = 0;
         const shippingCost = shippingMethod === 'standard' ? standardShippingFee : shippingMethod === 'express' ? 45 : 65;
         const finalTotal = calculatedSubtotal + shippingCost;
 

@@ -75,7 +75,7 @@ export async function POST(request: Request) {
         }
 
         // ── 3. Calculate shipping & Discounts ────────────────────────────────────────────
-        const standardShippingFee = calculatedSubtotal > 5000 ? 0 : 250;
+        const standardShippingFee = 0;
         const shippingCost =
             shippingMethod === 'express' ? 450
             : shippingMethod === 'overnight' ? 650

@@ -172,7 +172,7 @@ export default function PaymentPage() {
 
     const subtotal = cartTotal;
     // Calculate standard shipping taking subtotal AFTER discount into account? Or before? Usually before discount.
-    const standardShippingFee = subtotal > 5000 ? 0 : 250;
+    const standardShippingFee = 0;
     const shipping =
         shippingMethod === 'express' ? 450
             : shippingMethod === 'overnight' ? 650
@@ -500,7 +500,7 @@ export default function PaymentPage() {
                                 </div>
                                 <div className="space-y-4">
                                     {[
-                                        { id: 'standard', label: 'Standard Delivery', sub: '5-7 business days', price: cartTotal > 5000 ? 'Free' : 'R 250' },
+                                        { id: 'standard', label: 'Standard Delivery', sub: '5-7 business days', price: 'Free' },
                                         { id: 'express', label: 'Express Delivery', sub: '2-3 business days', price: 'R 450' },
                                         { id: 'overnight', label: 'Overnight Delivery', sub: 'Next business day', price: 'R 650' },
                                     ].map(opt => (
